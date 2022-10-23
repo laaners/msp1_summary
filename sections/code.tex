@@ -1,0 +1,74 @@
+% !TeX root = ../main.tex
+
+\section{Code}
+
+\subsection{Vanilla box}
+\fbox{\begin{minipage}{\linewidth}
+    \begin{addmargin}[0em]{0em}
+        \textbf{Input}: dataset $x_n\in\mathbb{R}^D$\\
+        $t_n\in\{-1,+1\}$, for $n=1:N$\\
+        Initialize $w_0$\\
+        $k\leftarrow 0$\\
+        \textbf{repeat}
+        \begin{addmargin}[1em]{0em}
+            $k\leftarrow k+1$\\
+            $n\leftarrow k$ mode $N$\\
+            \textbf{if} $\hat{t}_n\neq t_n$ \textbf{then}
+            \begin{addmargin}[1em]{0em}
+                $w_{k+1}\leftarrow w_k+\phi(x_n)t_n$
+            \end{addmargin}
+            \textbf{end if}
+        \end{addmargin}
+        \textbf{until} convergence
+    \end{addmargin}    
+\end{minipage}}
+
+\subsection{lstlisting}
+\begin{lstlisting}[language=C++, caption=Gestione dei comandi da parte di MainNode, label={lst:callback}, escapeinside=`']
+`$(\mathbb{B}^+)$'
+typedef enum {FREE,PICK,AT_SRC,DELIVERY,AT_DST,GOBACK} STATUS;
+std::string sender;
+std::string receiver;
+std::vector<float> caller_position(2,0);
+std::vector<float> target_position(2,0);
+int cruising = 0;
+
+int status = FREE; //stato iniziale
+
+void setGoalCallBack(const pick_e_delivery::NewGoal& new_goal) {
+    switch(status) {
+        case FREE: {
+            if(new_goal.command == PICK) {
+                status = PICK;
+                sender = new_goal.user;
+                receiver = "none";
+                caller_position[0] = new_goal.x;
+                caller_position[1] = new_goal.y;
+                pubNewGoal(new_goal.x,new_goal.y);
+                tooLongTimer.start();
+                break;
+            }
+        }
+        case PICK: {
+            if(new_goal.command == FREE) {
+                if (sender == new_goal.user) {
+                    status = FREE;
+                    sender = "none";
+                    receiver = "none";
+                    stopRobot();
+                }
+            }
+            else if(new_goal.command == PICK) {
+                ROS_INFO("Il robot ancora in missione");
+            }
+            break;
+        }
+        default: {
+            ROS_INFO("ERRORE, stato non riconosciuto");
+            break;
+        }
+    }
+    return;
+}
+\end{lstlisting}
+    

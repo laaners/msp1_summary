@@ -1,0 +1,54 @@
+% !TeX root = ../main.tex
+
+\section{Linear Time-Invariant Systems}
+\begin{itemize}
+    \item Linearity = input-output realtionship is linear
+    \item Time invariance = the output does not depend on the particular time the input is applied:
+    $$x(t)\rightarrow y(t)\leftrightarrow x(t-k)\rightarrow y(t-k)$$
+    \item The system can be completely characterized by its impulse response $h(t)$
+\end{itemize}
+
+The output:
+\begin{LARGE}
+    $$
+    y(n)=x(n)*h(n)=\sum_{k=-\infty}^\infty x(k)h(n-k)
+    $$
+\end{LARGE}
+
+\subsection{Convolution}
+\begin{itemize}
+    \item Flip the second term $h(n)\rightarrow h(-k)$
+    \item Shift $h$ by adding $n$ (if positive shift to right, if negative to left) $h(n-k)$
+    \item For output $y(n)$ sum all contributions of $x(k)$ and the shifted flipped $h$
+\end{itemize}
+Last step similar to scalar product. \textbf{The length of the convolution is the sum of the two signals-1 (n+m-1) and the support (x-axis from when the signals start to differ from 0) is the sum of the supports until the final support of the two}.
+
+Properties of convolution:
+\begin{itemize}
+    \item Commutativity
+    \item Associativity
+    \item Distributivity
+    \item Convolution by pulse $x(n)*\delta(n)=x(n)$
+    \item Convolution by a shifted pulse $x(n)*\delta(n-k)=x(n-k)$
+\end{itemize}
+
+Alternativetely, if $h(n)=h[n]=$sum of various $\delta$, we can apply the distributive property and sum various convolutions by $\delta$!
+
+\subsection{Discrete delay}
+$$y(n)=x(n-k)$$
+So:
+$$y(n)=x(n)*h(n)=x(n)*\delta(n-k)=x(n-k)$$
+
+\subsection{Moving average}
+\begin{LARGE}
+    $$
+    y(n)=\frac{1}{M}\sum_{m=0}^{M-1}x(n-m)
+    $$
+\end{LARGE}
+It is a filter, result of LTI system.
+
+The \textbf{impulse response}:
+$$y(n)=\frac{1}{M}\sum_{m=0}^{M-1}x(n)*\delta(n-m)=x(n)*\sum_{m=0}^{M-1}\delta(n-m)\rightarrow \mathbf{\sum_{m=0}^{M-1}\delta(n-m)}$$
+
+\subsection{Cosine signal and generic filter}
+We will get another cosine with very same frequency, but modified amplitude and phase. \textbf{Look at the exercise 20181107-1}

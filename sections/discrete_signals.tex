@@ -1,0 +1,62 @@
+% !TeX root = ../main.tex
+
+\section{Discrete Signals}
+\subsection{Impulse}
+    $$
+    \delta[n]=\begin{cases}
+        1,\text{ $n=0$}\\
+        0,\text{ $n\neq0$}
+    \end{cases}
+    $$
+
+\subsection{Discrete unit step}
+    $$
+    u[n]=\begin{cases}
+        1,\text{ $n\geq0$}\\
+        0,\text{ $n<0$}
+    \end{cases}
+    $$
+
+\subsection{Discrete exponential step}
+    $$
+    x(n)=a^nu(n)
+    $$
+
+\subsection{Discrete periodic signals}
+    $$
+    x(n)=x(n+kT)\qquad\forall\,\,k\in\,\,\mathbb{Z}
+    $$
+
+\subsection{Discrete-time sinusoids}
+From continuous to discrete
+    $$
+    y(t)=A\cdot\cos(2\pi f_0t+\phi)\rightarrow y(n)=A\cdot\cos(2\pi f_0T_sn+\phi)
+    $$
+    \begin{center}
+        OR
+    \end{center}
+    $$
+    \begin{cases}
+        y(t)=A\cdot\cos(2\pi f_0t+\phi)\rightarrow y(n)=A\cdot\cos(2\pi \tilde{f_0}n+\phi)\\
+        \tilde{f_0}=\frac{f_0}{F_s}=f_0\cdot T_s\qquad\text{ normalized frequency}\\
+        \tilde{\omega_0}=2\pi\tilde{f_0}=\frac{\omega_0}{F_s}=\omega_0T_s
+    \end{cases}
+    $$
+\begin{itemize}
+    \item $A=$ amplitude
+    \item $f_0=$ frequency [Hz]
+    \item $\omega_0=2\pi f_0=$ angular frequency [rad/s]
+    \item $\phi=$ phase [rad]
+    \item $\frac{1}{f_0}=\frac{2\pi T_s}{\tilde{\omega_0}}=$ \textbf{period of the sinusoid [seconds]}
+    \item $P_{samples}=\frac{1}{f_0\cdot T_s}=\frac{1}{\tilde{f_0}}=\frac{2\pi}{\tilde{\omega_0}}=\frac{F_s}{f_0}$ \textbf{period of the sinusoid [in samples]}
+    \item $t=n\cdot T_s=\left[start:T_s=\frac{1}{F_s}:end=\frac{1}{f_0}-\frac{1}{F_s}\right]$
+    \item $n=0,1,2,\cdots N=$ samples
+    \item $T_s=$ sampling time or sampling period
+    \item $F_s=\frac{1}{T_s}=$ \textbf{sampling rate/signal duration [Hz]}
+    \item \textbf{Signal as sum of sinusoids}
+    \begin{itemize}
+        \item \textbf{Principle of superposition}
+        $$x=\cos(\omega_1t)+\cos(\omega_2t)+\cos(\omega_3t)$$
+        \item \textbf{Global sinusoid period [in samples]}: mcm between the sinusoid periods in samples
+    \end{itemize}
+\end{itemize}

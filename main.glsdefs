@@ -1,0 +1,30 @@
+\ifglsentryexists{svm}{}%
+{%
+\gls@defglossaryentry{svm}%
+{%
+name={\acronymfont {svm}},%
+sort={svm},%
+type={acronym},%
+first={support vector machines},%
+firstplural={support vector machines\glstextup {s}},%
+text={svm},%
+plural={svm\glstextup {s}},%
+description={support vector machines},%
+descriptionplural={support vector machines\acrpluralsuffix },%
+symbol={svm},%
+symbolplural={svm\acrpluralsuffix },%
+user1={},%
+user2={},%
+user3={},%
+user4={},%
+user5={},%
+user6={},%
+long={support vector machines},%
+longplural={support vector machines\glstextup {s}},%
+short={svm},%
+shortplural={svm\glstextup {s}},%
+counter={page},%
+parent={},%
+%
+}%
+}%

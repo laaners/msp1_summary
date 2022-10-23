@@ -1,0 +1,44 @@
+% !TeX root = ../main.tex
+
+\section{Matlab}
+
+\begin{lstlisting}[language=Matlab, escapeinside=`']
+    close all
+    clearvars
+    clc
+\end{lstlisting}
+
+\subsection{Cosine signals}
+
+\subsubsection{Sum of multiple signals, lcm}
+The signal $w(n)$ is defiend as the sum of 3 cosinusoidal signals, where the first signal has frequency $f_0$, the second $f_0/2$, the third $f_0/4$. Define $w(n)$ such that it repeats periodically every 10ms, knowing that it is sampled with $F_s=1kHz$
+\begin{lstlisting}[language=Matlab, escapeinside=`']
+    Fs = 1e3;
+    P = 0.01;
+    P_samples = P*Fs;
+
+    % find the least common multiple among 1/f0, 2/f0, 4/f0
+    % --> 4/f0 = P_samples --> f0 = 4/P_samples
+    f0 = 4/P_samples;
+    f1 = f0/2;
+    f2 = f0/4;
+    N = 10*P_samples;
+    n = 0:N-1;
+    w = cos(2*pi*f0*n) + cos(2*pi*f1*n) + cos(2*pi*f2*n);
+\end{lstlisting}
+
+\subsection{Filters}
+
+\subsubsection{FIR filter to attenuate signal and conjugate zero/pole}
+You are given two zeros with absolute value equal to 2 in complex conjugate position, build a FIR filter in order to attenuate a signal with frequency $f_1=\cdots$
+\begin{lstlisting}[language=Matlab, escapeinside=`']
+    z1 = 2*exp(1i*2*pi*f1);
+    z2 = conj(z1);
+
+    A = 1; % it is a FIR
+    % If we have two zeroes which are complex conjugate, we can
+    % always define the polynomial related to the zeros as
+    % 1 - 2*rho*cos(theta)z^{-1} + rho^2 z^{-2}
+    B = [1, -2*cos(2*pi*f1), 4];
+    y = filter(B,A,x);
+\end{lstlisting}

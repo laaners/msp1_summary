@@ -1,0 +1,171 @@
+% !TeX root = ../main.tex
+
+\section{Tables}
+\subsection{Tic Tac Toe}
+\begin{tabular}{c|c|c}
+    1 & 2 & 3 \\      \hline
+    4 & 5 & 6 \\      \hline
+    7 & 8 & 9
+\end{tabular}
+
+\subsection{Simple with header}
+\begin{tabularx}{\linewidth}{X|X|X}
+    \toprule
+    \textbf{} & \textbf{Actual Class: 1} & \textbf{Actual Class: 0}\\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{} & \textbf{Actual Class: 1} & \textbf{Actual Class: 0}\\
+    \midrule
+    \endhead
+    \footnotesize [Continues on next page]
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    %body
+    \textbf{Predicted Class: 1} & $t_p$ & $f_p$\\ \midrule
+    \textbf{Predicted Class: 0} & $f_n$ & $t_n$
+\end{tabularx}
+
+\begin{tabularx}{\linewidth}{X|X|X}
+    \toprule
+    \textbf{} & \textbf{Actual Class: 1} & \textbf{Actual Class: 0}\\
+    \hline
+    \endfirsthead
+    \toprule
+    \textbf{} & \textbf{Actual Class: 1} & \textbf{Actual Class: 0}\\
+    \hline
+    \endhead
+    \footnotesize [Continues on next page]
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    %body
+    \textbf{Predicted Class: 1} & $t_p$ & $f_p$\\ \hline
+    \textbf{Predicted Class: 0} & $f_n$ & $t_n$
+\end{tabularx}
+
+\subsection{Long text in cells}
+\begin{tabularx}{\linewidth}{p{0.2\textwidth}|X|X}
+    \toprule
+    \textbf{} & \textbf{Bagging (or bootstrapping)} & \textbf{Boosting}\\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{} & \textbf{Bagging (or bootstrapping)} & \textbf{Boosting}\\
+    \\
+    \midrule
+    \endhead
+    \midrule
+    \footnotesize [Continues on next page]
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    \textbf{How it works} & \textbf{Decreases variance by averaging}.\newline
+    Train a lot of models/predictions (e.g. $N$), \textbf{average} them:
+    \newline\newline $Var(\overline{x})=\frac{Var(x)}{N}$\newline\newline
+    Average within infinite element is zero\newline
+    Build a lot of models with high variance and averaging them? \textbf{Dataset problem, the formula holds if variables in $\overline{X}$ are independent, independent models, if not we get less information}.\newline
+    Try to use as much data as possible, \textbf{bootstrap samples}, take random samples from original dataset, random sampling with replacement. & 
+    Combine many weak learners into a strong learner.\newline\newline
+    1) \textbf{Weight all train samples equally, train weak/simple learner on training set} (that must be better than random, error > 0.5)\newline\newline
+    2) There will be some samples on which learner is good, others on which is bad. \textbf{Compute error on each sample of training set, increase weights on train cases where model gets wrong}\newline\newline
+    3) \textbf{Train new model on re-weighted train set}, re-compute error, increase weights on cases model gets wrong... \textbf{repeat until tired}\newline\newline
+    Final model: \textbf{weighted} prediction of each model
+\end{tabularx}
+
+\subsection{Multirow}
+\begin{tabularx}{\linewidth}{X X X X}
+    \toprule
+    \textbf{Problem} & \textbf{Input$\rightarrow$Output} & \textbf{Bellman equation} & \textbf{Algorithm}\\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{Problem} & \textbf{Input$\rightarrow$Output} & \textbf{Bellman equation} & \textbf{Algorithm}\\
+    \midrule
+    \endhead
+    \midrule
+    \footnotesize [Continues on next page]
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    \multirow{2}{*}{\textbf{Control}}   & $MDP\rightarrow\left(V^*,\pi^*\right)$ & Bellman expectation equation+greedy & Policy iteration \\ \cmidrule{3-4}
+                                        & & Bellman optimality equation & Value iteration
+\end{tabularx}
+
+\begin{tabularx}{\linewidth}{X X X}
+    \toprule
+    \textbf{Problem} & \textbf{Description} & \textbf{Algorithms}\\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{Problem} & \textbf{Description} & \textbf{Algorithms}\\
+    \midrule
+    \endhead
+    \midrule
+    \footnotesize [Continues on next page]
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    \multirow{3}{*}{\textbf{Model-free Prediction}} & Estimates the value function of an unknown MRP (MDP+policy), \textbf{fixed policy}, we want to know how much we get from the environment (cannot say anything about optimal)& Monte-Carlo (first and every visit) \\ \cmidrule{3-3}
+    & & Temporal Difference \\ \cmidrule{3-3}
+    & & TD($\lambda$) (forward and backward-view)\\ \midrule
+    \multirow{2}{*}{\textbf{Model-free Control}} & Optimizes the value function of an unknown MDP, \textbf{actively change policy} to get optimal policy & On-policy Monte-Carlo $\epsilon$-greedy (GLIE) \\ \cmidrule{3-3}
+    & & On-policy Temporal Difference $\epsilon$-greedy (SARSA) \\ \cmidrule{3-3}
+    & & Off-policy Importance Sampling (off-policy Monte-Carlo and SARSA) \\ \cmidrule{3-3}
+    & & Off-policy Q-learning
+\end{tabularx}
+
+\begin{tabularx}{\linewidth}{X X X X}
+    \toprule
+    \textbf{Type} & \textbf{Deterministic} & \textbf{Stochastic} & \textbf{Adversarial}\\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{Type} & \textbf{Deterministic} & \textbf{Stochastic} & \textbf{Adversarial}\\
+    \midrule
+    \endhead
+    \midrule
+    \footnotesize [Continues on next page]
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    \textbf{FREQUENTIST} & Trivial & UCB (like UCB1) & \multirow{2}{5.5cm}{We do not have any parameter to estimate, don't have anything that characterizes our reward, so does not make sense distinguish freq and bayesian. An approach is EXP3}\\[4ex] \cmidrule{1-3}
+    \textbf{BAYESIAN } & Trivial & Thompson sampling \\[4ex]
+\end{tabularx}
+
+\subsection{No header}
+\begin{tabularx}{\linewidth}{c|X X X X X X}
+    \toprule
+    \endfirsthead
+    \toprule
+    \midrule
+    \endhead
+    \footnotesize [Continues on next page]
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    %body
+    $x$ & 1 & 1.5 & 3 & 4.5 & 5.5 & 6.5\\
+    $t$ & 2.5 & 2.5 & 6 & 10 & 10.5 & 12\\ \midrule
+    $f(x)$ & 2 & 3 & 6 & 9 & 11 & 13
+\end{tabularx}
+
+\subsection{No header, "multicol" trick}
+\begin{tabularx}{\linewidth}{X|c c c|c c c|c c c}
+    \toprule
+    \endfirsthead
+    \toprule
+    \midrule
+    \endhead
+    \midrule
+    \footnotesize [Continues on next page]
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    & & $\gamma=0.9$ & & & $\gamma=0.95$ & & & $\gamma=0.99$ &\\ \midrule
+    & d & so & cm & d & so & cm & d & so & cm\\ \midrule
+    s1 & 35 & 25 & 0 & 95 & 90 & 0 & 780 & 785 & 0\\ \midrule
+    s2 & 55 & 0 & 45 & 120 & 0 & 125 & 810 & 0 & 825\\ \midrule
+    s3 & 165 & 0 & 0 & 240 & 0 & 0 & 940 & 0 & 0
+\end{tabularx}

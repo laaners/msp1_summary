@@ -1,0 +1,170 @@
+% !TeX root = main
+\documentclass[a4paper, 11pt]{article}
+
+%------------------------------------------------------------------------------------
+% import packages
+\usepackage[scaled]{helvet}
+%\usepackage{courier}
+%\renewcommand\familydefault{\sfdefault} 
+
+% Should include times new roman according to the slides
+\usepackage{mathptmx}
+
+% To use matrix
+\usepackage{amsmath}
+
+% To use mathbb
+\usepackage{amssymb}
+
+% To draw FSA
+\usepackage{tikz}
+\usetikzlibrary{automata,positioning,decorations.text,topaths,arrows.meta,decorations.pathmorphing,quotes}
+
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{ltablex}
+\usepackage{multirow}
+\usepackage{subfig}
+\usepackage{caption, booktabs}
+\usepackage[hidelinks]{hyperref}
+\usepackage[shortlabels]{enumitem}
+
+% Font weight for pictures labels
+\usepackage[labelfont=bf]{caption}
+
+% No indent on new paragraphs
+\usepackage[parfill]{parskip}
+
+% Margins
+\usepackage[margin=1in]{geometry}
+
+% Set TOC Depth
+\setcounter{tocdepth}{3}
+
+% Left space
+\usepackage{scrextend}
+
+% Matrix with more than 10 columns
+\setcounter{MaxMatrixCols}{20}
+
+% code
+\usepackage{listings}
+\usepackage{color}
+\definecolor{lightgray}{rgb}{.9,.9,.9}
+\definecolor{darkgray}{rgb}{.4,.4,.4}
+\definecolor{purple}{rgb}{0.65, 0.12, 0.82}
+\lstdefinelanguage{Matlab}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, all},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{\%},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{orange}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\lstset{
+    language=Matlab,
+    extendedchars=true,
+    basicstyle=\footnotesize\ttfamily,
+    showstringspaces=false,
+    showspaces=false,
+    %numbers=left,
+    numberstyle=\footnotesize,
+    numbersep=9pt,
+    tabsize=2,
+    breaklines=true,
+    showtabs=false,
+    captionpos=b,
+    breaklines=true,
+    morekeywords={matlab2tikz},
+    keywordstyle=\color{blue},
+    morekeywords=[2]{1}, keywordstyle=[2]{\color{black}},
+    identifierstyle=\color{black},
+    stringstyle=\color{mylilas},
+    commentstyle=\color{mygreen},
+    showstringspaces=false,%without this there will be a symbol in the places where there is a space
+    emph=[1]{for,end,break},emphstyle=[1]\color{red},
+    frame=single
+}
+
+% functions with arrow
+\newcommand{\f}[2]{\ensuremath{f:\,\,{#1}\rightarrow {#2}}}
+
+% brackets
+\newcommand{\brackets}[1]{\ensuremath{\{{#1}\}}}
+\newcommand{\Brackets}[1]{\ensuremath{\begin{Bmatrix}
+    {#1}
+\end{Bmatrix}}}
+
+% insieme quoziente
+\newcommand{\bigslant}[2]{{\raisebox{.2em}{$#1$}\left/\raisebox{-.2em}{$#2$}\right.}}
+
+% underlabel
+\newcommand{\underlabel}[2]{\ensuremath{
+    \underset{\text{#2}}{\underbrace{#1}}
+}}
+
+% mybox
+\newcommand{\mybox}[1]{
+    \fbox{\begin{minipage}{\linewidth}
+        \vspace{1em}
+        #1
+        \vspace{1em}
+    \end{minipage}}
+}
+
+\graphicspath{ {images/} }
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+\begin{document}
+
+\begin{titlepage}
+	\centering
+    \begin{tabular}{rl}
+        Alessio Hu & (12345678)
+    \end{tabular}
+
+    \vspace{1.5cm}
+    {\Huge \textbf{Multimedia Signals Processing\\}}
+    \vspace{1.5cm}
+    {\large 
+        Multimedia Signals Processing \\
+        Prof. Marco Marcon \\ 
+		DEIB - Politecnico di Milano \par
+    }
+    \vspace{1.5cm}
+    {\large \textbf{Something:}\\
+    \vspace{0.5cm}
+    Something else}
+    \par
+    \vspace{3cm}
+    \includegraphics[scale=0.4]{images/logo.pdf}
+    \par
+    \vspace{3cm}
+	A.Y. 2022-2023
+\end{titlepage}
+
+\tableofcontents
+    \include{sections/discrete_signals}
+    \include{sections/lti}
+    \include{sections/z_transform}
+    \include{sections/dtft}
+    \include{sections/dft}
+    \include{sections/filters}
+    \include{sections/matlab}
+    \include{sections/exe}
+\end{document}

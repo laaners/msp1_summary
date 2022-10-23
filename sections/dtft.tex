@@ -1,0 +1,48 @@
+% !TeX root = ../main.tex
+
+\section{Discret Time Fourier Transform (DTFT)}
+Discrete time sequence \textbf{non periodic} and I compute a continuous frequency signal (continuous in frequency domain). Defined as
+\begin{LARGE}
+    $$
+    X(f)=\sum_{n=-\infty}^\infty x(n)e^{-j2\pi fn}
+    $$
+\end{LARGE}
+\begin{itemize}
+    \item $f$ is the normalized frequency in $[0,1)$ or $[-0.5,0.5)$
+    \item $\omega=2\pi f$ is the normalized angular frequency in $[0,2\pi)$ or $[-\pi,\pi)$
+    \item DTFT is periodic with period = 1 in normalized frequency, period = $2\pi$ in normalized omega, period = $Fs$ in frequency [Hz]
+\end{itemize}
+
+\subsection{Properties}
+\begin{itemize}
+    \item DTFT$\brackets{x(n)*y(n)}=X(f)\cdot Y(f)$
+    \item DTFT$\brackets{x(n-k)}=X(f)\cdot e^{-j2\pi fk}$
+    \item If $x(n)$ is real, $X(f)=X^*(-f)$, symmetric behavior
+    \item Relationship with Z-transform: $X(f)=X(z)\Big|_{|z|=1}$
+\end{itemize}
+Given
+$$
+H(z)=\frac{
+    \sum_{k=0}^Nb_kz^{-k}
+}{
+    \sum_{k=0}^Da_kz^{-k}
+}\Rightarrow H(f)=H(z)\Big|_{|z|=1}
+$$
+\begin{itemize}
+    \item The amplitude is
+    $$
+    |H(f)|=|H(z)|\Big|_{|z|=1}=\frac{
+        \left|\sum_{k=0}^Nb_kz^{-k}\right|
+    }{
+        \left|\sum_{k=0}^Da_kz^{-k}\right|
+    }\Bigg|_{|z|=1}
+    $$
+    \item The phase (depends on the zeros, not on the poles) is
+    $$
+    \angle(H(f))=\angle(H(z))\Big|_{|z|=1}=\angle\left(
+        \sum_{k=0}^Nb_kz^{-k}
+    \right)-\angle\left(
+        \sum_{k=0}^Da_kz^{-k}
+    \right)\Bigg|_{|z|=1}
+    $$
+\end{itemize}
