@@ -128,6 +128,19 @@ A general form to represent an allpass real valued impulse response is:
 \begin{center}
     \includegraphics[width=0.6\textwidth]{images/allpass.png}
 \end{center}
+We introduced a coefficient $c_0$ in order to guarantee magnitude of 1. Basically
+$$
+H(z)=\left|c_0\frac{B_{ap}(z)}{A_{ap}(z)}\right|_{|z|=1}=1
+$$
+We pass to the frequency domain. As that fraction is flat in the frequency domain, we choose frequency $f=0,z=1$:
+$$
+|c_0|\frac{|B_{ap}(z=1)|}{|A_{ap}(z=1)|}=1
+$$
+$$
+\Rightarrow c_0 = \pm\frac{|A_{ap}(z=1)|}{|B_{ap}(z=1)|}
+$$
+So to find $c_0$ just sum  all the coefficients and then compute the division.
+
 \textbf{Zeros and poles are in conjugate reciprocal pairs}.
 Properties:
 \begin{itemize}
@@ -135,3 +148,100 @@ Properties:
     \item Each pole of an allpass system is associated with a conjugate reciprocal zero
     \item The magnitude of many cascaded allpass filters is always the same
 \end{itemize}
+
+\subsubsection{Minimum phase filters}
+\begin{itemize}
+    \item Minimum phase filters are such that both $H(z)$ and $\frac{1}{H(z)}$ are stable and causal
+    \item The poles must be inside the unit circle
+    \item The zeros must be inside the unit circle
+    \item Given a square magnitude response $M(z)$, there is a unique system whose zeros and poles are inside the unit circle and it is called minimum phase system
+\end{itemize}
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{images/minphase.png}
+\end{center}
+Properties of allpass: \textbf{Any rational causal stable system can be decomposed into the multiplication of a minimum phase system and an allpass system}
+$$
+H(z)=H_{min}(z)H_{ap}(z)
+$$
+Causal and stable, so all poles are inside the unit circle!\\
+$H_{min}(z)$ contains:
+\begin{itemize}
+    \item The poles and the zeros of $H(z)$ that lie inside the unit circle
+    \item Zeros that are conjugate reciprocals of the zeros $H(z)$ lying outside the unit circle
+\end{itemize}
+$H_{ap}(z)$ contains:
+\begin{itemize}
+    \item All the zeros of $H(z)$ that lie outside the unit circle
+    \item Poles that are conjugate reciprocals of the zeros of $H(z)$ lying outside the unit circle
+\end{itemize}
+
+\subsection{Digital filters' design}
+\begin{enumerate}
+    \item Specify always the characteristics of the filter in frequency domain, not in time domain (e.g. lowpass, highpass, bandpass...)
+    \item Approximate these properties using a discrete-time system, find the filter coefficients
+    \item Realize the system using finite precision arithmetic
+\end{enumerate}
+
+\subsubsection{Ideal filters}
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{images/idealfilter.png}
+\end{center}
+Outside the rectangle is called \textbf{stopband}. The impulse response of this filter is $\approx$ the sinc function. It is \textbf{non-causal (sinc has on the left non-causal part)} with an \textbf{infinite delay}, \textbf{real systems can only approximate}.
+
+\subsubsection{Real filters}
+\begin{center}
+    \includegraphics[width=1\textwidth]{images/realfilter.png}
+\end{center}
+Oscillations both in passband and in stopband. Cutoff frequency is the frequency in which I pass from the passband to the stopband.
+
+As I don't want ripples and we want transition band to 0:
+\begin{itemize}
+    \item Peak ripple $\rightarrow$ 0
+    \item Transition band $\rightarrow$ 0
+\end{itemize}
+We consider FIR and IIR cases:
+\begin{center}
+    \includegraphics[width=1\textwidth]{images/IIRvsFIR.png}
+\end{center}
+Allpass must be FIR.
+
+\subsubsection{FIR filter design: windowing method}
+I want a rectangle in the frequency, but in the time I have a sinc: obtain a FIR filter by truncating an infinite duration impulse response
+\begin{itemize}
+    \item Given the ideal $h_i(n)$, build $h(n)=h_i(n)w(n)$
+    \item $w(n)$ is a finite duration window, in frequency domain it becomes convolution
+    \item $H(f)$ is a blurred version of the ideal filter $H_i(f)$
+\end{itemize}
+\textbf{Windowing means multiplying in the time, so in the frequency we have convolution}.
+
+How to choose the window? Tradeoff
+\begin{itemize}
+    \item As short as possible (in time) to minimize the cost of the FIR filter
+    \item As narrow as possible in frequency to approach the ideal filter (a narrow in the time means very large in the frequency domain)
+\end{itemize}
+I want a short signal in the time, so an impulse, $W(f)$ should look like a $\delta(f)$, without considering the filter cost
+\begin{itemize}
+    \item Its energy must be concentrated around $f=0$
+    \item $W(f)$ should decay fast as frequency increases
+\end{itemize}
+\begin{center}
+    \includegraphics[width=1\textwidth]{images/lobe.png}
+\end{center}
+We want a big ration of $\frac{width(MainLobe)}{width(SecondaryLobes)}$. Every window is characterized by:
+\begin{itemize}
+    \item Main-lobe width: it decreases as the window length increases
+    \item Side-lobes rejection: ratio between the main-lobe peak and 1° secondary lobe peak [dB]
+    \item Side-lobes roll off: asymptotic decay of the side-lobe peaks vs frequency octave [dB/octave] or frequency decade [dB/decade
+\end{itemize}
+
+\subsection{Aspects to remember}
+\begin{itemize}
+    \item \textbf{Phase is always correlated with a delay in the time}
+    \item \textbf{FIR are always stable}, the numerator has greater grade than denominator
+    \item \textbf{Allpass MUST be FIR}
+    \item \textbf{Only poles in the origin means FIR}
+    \item \textbf{Denominator = 1 means FIR}
+    \item \textbf{Maximum phase will result in jumps in the phase plot}
+    \item \textbf{Minimum phase has the greatest part of energy of the filter concentrated in the first part of the temporal samples}, which means I am introducing very small delay
+\end{itemize}
+
