@@ -10,35 +10,276 @@
 
 \subsection{Cosine signals}
 
-\subsubsection{Sum of multiple signals, lcm}
-The signal $w(n)$ is defiend as the sum of 3 cosinusoidal signals, where the first signal has frequency $f_0$, the second $f_0/2$, the third $f_0/4$. Define $w(n)$ such that it repeats periodically every 10ms, knowing that it is sampled with $F_s=1kHz$
-\begin{lstlisting}[language=Matlab, escapeinside=`']
-    Fs = 1e3;
-    P = 0.01;
-    P_samples = P*Fs;
+    \subsubsection{Sinusoid signal continuous, in time and in samples plot}
+    A sinusoid in continuous domain is
+    $$
+    x(t)=A\cdot\cos(2\pi ft+\phi)
+    $$
+    Its sampled version is:
+    $$
+    \begin{cases}
+        x(n)=A\cdot\cos(2\pi \tilde{f}n+\phi)\\
+        \tilde{f}=\frac{f}{F_s}
+    \end{cases}
+    $$
+    Given:
+    $$
+    \begin{cases}
+        t=[0,0.5]\\
+        F_s=1000\,\,Hz=\frac{1}{T_s}\qquad\text{sampling rate}\\
+        A=0.8\qquad\text{amplitude}\\
+        f=50\,\,Hz\qquad\text{frequency, not normalized}\\
+        \phi=30^\circ=\frac{\pi}{6}\qquad\text{phase}
+    \end{cases}
+    $$
+    In matlab:
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        A = 0.8;
+        f = 50;
+        Fs = 1e3; %1000;
+        Ts = 1/Fs;
+        t = 0:Ts:0.5;
+        phi = 30; % deg
+        
+        % conversion
+        % phi_deg:phi_rad = 180: pi
+        phi_rad = phi*pi/180;
+        
+        x = A*cos(2*pi*f*t + phi_rad);
 
-    % find the least common multiple among 1/f0, 2/f0, 4/f0
-    % --> 4/f0 = P_samples --> f0 = 4/P_samples
-    f0 = 4/P_samples;
-    f1 = f0/2;
-    f2 = f0/4;
-    N = 10*P_samples;
-    n = 0:N-1;
-    w = cos(2*pi*f0*n) + cos(2*pi*f1*n) + cos(2*pi*f2*n);
-\end{lstlisting}
+        %% Plot the signals as a function of time and as a function of samples
+
+        figure(1);
+        plot(t, x);
+        hold on;
+        plot(t, x1, '--');
+        title('Signals as a function of time');
+
+        figure(2);
+        plot(x); %plot(1:length(x), x);
+        hold on;
+        plot(1:length(x1), x1, '--');
+        title('Signals as a function of samples');
+
+    \end{lstlisting}
+
+    \subsubsection{Sum of multiple signals continuous, lcm}
+    Build a signal $x(n)$ as the sum of three different sinusoids  at the normalized angular frequencies $\tilde{\omega}_1=\pi/5$, $\tilde{\omega}_2=\pi/8$, $\tilde{\omega}_3=\pi/4$.\\
+    The sampling period is $T_s = 0.3$ seconds, and  the signal is defined for $t$ in $[0, 100]$ seconds.
+
+    We know that
+    $$
+    \tilde{\omega}=2\pi\tilde{f}=\frac{\omega}{F_s}=\omega T_s
+    $$
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        T = .3;
+        end_duration = 100;
+        time = 0:T:end_duration;
+        
+        % normalized omegas
+        omega_1_n = pi/5; 
+        omega_2_n = pi/8;
+        omega_3_n = pi/4;
+        
+        % omegas 
+        omega_1 = omega_1_n / T;
+        omega_2 = omega_2_n / T;
+        omega_3 = omega_3_n / T;
+        
+        % principle of superposition
+        A_1 = 1; % not specified so 1
+        A_2 = 1; % not specified so 1
+        A_3 = 1; % not specified so 1
+        x = A_1*cos(omega_1*time) + A_2*cos(omega_2*time) + A_3*cos(omega_3*time);
+    \end{lstlisting}
+    For the period of sinusoid in time and samples we have:
+    $$
+    \frac{1}{f}=\frac{2\pi T_s}{\tilde{\omega}}\qquad\text{Period in seconds}
+    $$
+    $$
+    \frac{1}{f\cdot T_s}=\frac{1}{\tilde{f}}=\frac{2\pi}{\tilde{\omega}}=\frac{F_s}{f}\qquad\text{Period in samples}
+    $$
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        %% compute the period of the sinusoids (seconds)
+
+        P_1 = 2*pi*T/omega_1_n;
+        P_2 = 2*pi*T/omega_2_n;
+        P_3 = 2*pi*T/omega_3_n;
+        
+        % If you work with matrices: NB: here you have to put ./ otherwise MATLAB reports an error.
+        % P = 2*pi*T ./ Omega_n;s
+        
+        %% compute the period of the sinusoids (samples)
+        
+        P_1_samples = P_1 /T; % 10
+        P_2_samples = P_2 /T; % 16
+        P_3_samples = P_3 /T; % 8
+        
+        %% period of x = lcm among (10, 16, 8) = 2^4 * 5
+        
+        P_x_samples = lcm(lcm(P_1_samples, P_2_samples), P_3_samples);
+        P_x = P_x_samples * T;
+    \end{lstlisting}
+
+    \subsubsection{Sum of multiple signals discrete, lcm}
+    The signal $w(n)$ is defiend as the sum of 3 cosinusoidal signals, where the first signal has frequency $f_0$, the second $f_0/2$, the third $f_0/4$. Define $w(n)$ such that it repeats periodically every 10ms, knowing that it is sampled with $F_s=1kHz$
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        Fs = 1e3;
+        P = 0.01;
+        P_samples = P*Fs;
+
+        % find the least common multiple among 1/f0, 2/f0, 4/f0
+        % --> 4/f0 = P_samples --> f0 = 4/P_samples
+        f0 = 4/P_samples;
+        f1 = f0/2;
+        f2 = f0/4;
+        N = 10*P_samples;
+        n = 0:N-1;
+        w = cos(2*pi*f0*n) + cos(2*pi*f1*n) + cos(2*pi*f2*n);
+    \end{lstlisting}
+
+\subsection{Discrete Signals (non-sinusoidal)}
+
+    \subsubsection{Shifting}
+    Signal $x(n)=0.8^nu(n)$ in $n=1:20$. Generate the signals $y_1(n)=x(n-5)$ and $y_2(n)=x(n+5)$ always in $n=1:20$
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        % Generate the signal x(n) = (0.8)^n u(n), n = 1:20
+        % Generate the signal y1(n) = x(n-5),  n = 1:20
+        % Generate the signal y2(n) = x(n+5), n = 1:20
+        n = 1:20;
+        x = (0.8).^n;
+        
+        % initialize the two signals
+        y1 = zeros(size(n));
+        y2 = zeros(size(x));
+
+        y1 = circshift(x, 5); % x(n-5)
+        y1(1:5) = 0;
+
+        y2 = circshift(x, -5); % x(n+5)
+        y2(end-5:end) = 0;
+    \end{lstlisting}
+
+    \subsubsection{Periodicity}
+    Generate the signal $x(n)=u(n-5)-u(n-10)$ considering $n=1:15$, then generate the periodic version $x_p(n)$ wih period $N=15$ considering $n=1:200$. Then plot the periodic signal considering only 8 periods.
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        % generate signal x(n)
+        N = 15; % period
+        n = 1:N;
+        x = zeros(1,N);
+        x(n >= 5 & n < 10) = 1;
+        stem(n, x);
+        hold on;
+
+        % Generate the periodic signal xp(n) with period N = 15,
+        % considering n = 1:200
+
+        n_max = 200;
+        N_p = ceil(n_max/N);
+        x_p = repmat(x,1,N_p);
+        x_p = x_p(1:n_max);
+
+        stem(1:15*8, x_p(1:15*8));
+    \end{lstlisting}
+
+    \subsubsection{Convolution}
+    Given:
+
+    $
+    x(n)=[3,11,7,0,-1,4,2]\qquad n\in[-3,3]\\
+    h(n)=[2,3,0,-5,2,1]\qquad n\in[-1,4]
+    $
+
+    Compute the convolution
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        n_x = -3:3;
+        n_h = -1:4;
+        
+        x = [3, 11, 7, 0, -1, 4, 2];
+        h = [2, 3, 0, -5, 2, 1];
+        y = conv(x, h);
+        supp = n_x(1) + n_h(1):n_x(end) + n_h(end); % always like this
+
+        figure;
+        stem(supp, y);
+    \end{lstlisting}
+
+    \subsubsection{Shifting through convolution}
+    Given $x(n)=[3,11,7,0,-1,4,2]$, $n\in[-3,3]$, create $y(n)=x(n-5)$ $n\in[0,10]$ without using circshift or for loops
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        % y(n)=x(n-5)=x(n)*\delta(n-5)
+        n_x = -3:3;
+        x = [3, 11, 7, 0, -1, 4, 2];
+        
+        n_h = 0:10;
+        delta_5 = zeros(size(n_h));
+        delta_5(n_h == 5) = 1;
+        
+        % support of the convolution
+        n_conv = n_x(1) + n_h(1):n_x(end) + n_h(end);
+        
+        y = conv(delta_5, x); % as commutative
+        
+        % but we want only from 0:10
+        y = y(n_conv >= 0 & n_conv <= 10);
+        stem(0:10, y);
+    \end{lstlisting}
+    Create $y(n)=\frac{1}{3}\sum_{m=0}^2x(n-m)$ $n\in[0,10]$ without using circshift or for loops
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        % define the filter, which is 1/3 (delta(n) + delta(n-1) + delta(n-2))
+        n_h = 0:10;
+        h = zeros(size(n_h));
+        h(1:3) = 1/3;
+        
+        % support of the convolution:
+        n_conv = n_x(1) + n_h(1): n_x(end) + n_h(end);
+        
+        y = conv(x, h);
+        
+        % we wanted y defined only for n = 0:10 
+        y = y(n_conv>=0 & n_conv <= 10);
+    \end{lstlisting}
+
+\subsection{Z transform}
 
 \subsection{Filters}
 
-\subsubsection{FIR filter to attenuate signal and conjugate zero/pole}
-You are given two zeros with absolute value equal to 2 in complex conjugate position, build a FIR filter in order to attenuate a signal with frequency $f_1=\cdots$
-\begin{lstlisting}[language=Matlab, escapeinside=`']
-    z1 = 2*exp(1i*2*pi*f1);
-    z2 = conj(z1);
+    \subsubsection{FIR filter to attenuate signal and conjugate zero/pole}
+    You are given two zeros with absolute value equal to 2 in complex conjugate position, build a FIR filter in order to attenuate a signal with frequency $f_1=\cdots$
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        z1 = 2*exp(1i*2*pi*f1);
+        z2 = conj(z1);
 
-    A = 1; % it is a FIR
-    % If we have two zeroes which are complex conjugate, we can
-    % always define the polynomial related to the zeros as
-    % 1 - 2*rho*cos(theta)z^{-1} + rho^2 z^{-2}
-    B = [1, -2*cos(2*pi*f1), 4];
-    y = filter(B,A,x);
+        A = 1; % it is a FIR
+        % If we have two zeroes which are complex conjugate, we can
+        % always define the polynomial related to the zeros as
+        % 1 - 2*rho*cos(theta)z^{-1} + rho^2 z^{-2}
+        B = [1, -2*cos(2*pi*f1), 4];
+        y = filter(B,A,x);
+    \end{lstlisting}
+
+\subsection{Functions Recap}
+\begin{lstlisting}[language=Matlab, escapeinside=`']
+    %==========================================================================
+    %% Shifting discrete signals, a positive value will shift to the right. Circular, if shifting right by n, first n values will become the last n values
+    circshift([1 2 3 4 5], 2);
+    % [4 5 3 2 1]
+    %==========================================================================
+    %% Periodic sequence generation. The first paramater is the matrix, the second one is the rows repetition, the third is the cols repetition
+    repmat([1 2 3],1,3);
+    % [1 2 3 1 2 3 1 2 3]
+    repmat([1 2 3],2,3);
+    % [1 2 3 1 2 3 1 2 3;
+    %  1 2 3 1 2 3 1 2 3] 
+    %==========================================================================
+    %% Returns the convolution of vectors u and v. If u and v are vectors of polynomial coefficients, convolving them is equivalent to multiplying the two polynomials.
+    conv([1 1],[1 1]) % (1+x)(1+x)
+    % [1 2 1], which is (1+x)(1+x)=1+2x+x^2
+    %==========================================================================
+    %==========================================================================
+    %==========================================================================
+    %==========================================================================
+    %==========================================================================
+    %==========================================================================
+    %==========================================================================
 \end{lstlisting}
