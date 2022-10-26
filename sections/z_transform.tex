@@ -110,7 +110,13 @@ H(z)=h_0\prod_{n=1}^k(1-z_nz^{-1})\qquad h_0=H(n=0)
 $$
 $z_n$ are called roots of the polynomial $H(z)$. Thanks to convolution theorem
 $$
-H(z)=h_0H_1(z)H_2(z)\cdots H_k(z)
+H(z)=h_0\cdot H_1(z)\cdot H_2(z)\cdots H_k(z)
+$$
+$$
+\Downarrow
+$$
+$$
+h(n)=h_0\cdot h_1(n)*h_2(n)*h_3(n)*\cdots*h_k(n)
 $$
 Where
 $$
@@ -167,14 +173,10 @@ $M$ is the multiplicity of the root (or pole) $p_k$. The Z transform inversion i
 \textbf{To move from maximum phase to minimum phase, consider the reciprocals of the zeros}.
 
 \subsubsection{Transfer function evaluation in time domain: direct form \#1}
-\begin{figure}[!ht]
-    \begin{minipage}{\linewidth}
-        \centering
-        \makebox[\textwidth][c]{\includegraphics[width=0.8\textwidth]{images/Screenshot from 2022-10-07 16-24-14.png}}%
-        \caption{Direct form \#1, in this case for $n<0$ the system for us it does not exist, so zero: so $h(n=0)=b_0=1$ in our case}
-        %\label{BarsNielsenCrop}
-    \end{minipage}
-\end{figure}
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{images/Screenshot from 2022-10-07 16-24-14.png}
+\end{center}
+Direct form \#1, in this case for $n<0$ the system for us it does not exist, so zero: so $h(n=0)=b_0=1$ in our case
 
 \subsubsection{From generic output to transfer function and complex conjugates}
 Consider
