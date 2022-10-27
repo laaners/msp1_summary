@@ -230,18 +230,21 @@ I want a short signal in the time, so an impulse, $W(f)$ should look like a $\de
 We want a big ration of $\frac{width(MainLobe)}{width(SecondaryLobes)}$. Every window is characterized by:
 \begin{itemize}
     \item Main-lobe width: it decreases as the window length increases
-    \item Side-lobes rejection: ratio between the main-lobe peak and 1° secondary lobe peak [dB]
+    \item Side-lobes rejection: ratio between the main-lobe peak and 1° secondary lobe peak [dB], if I want it high for example the blackman window is quite good
     \item Side-lobes roll off: asymptotic decay of the side-lobe peaks vs frequency octave [dB/octave] or frequency decade [dB/decade
 \end{itemize}
+\textbf{In matlab set cutoff = double of desired one, if I want cutoff of 0.5 I will put in matlab 1}.
 
 \subsection{Aspects to remember}
 \begin{itemize}
     \item \textbf{Phase is always correlated with a delay in the time}
+    \item \textbf{Real filters always introduce a delay, a phase term}
     \item \textbf{FIR are always stable}, the numerator has greater grade than denominator
     \item \textbf{Allpass MUST be FIR}
     \item \textbf{Only poles in the origin means FIR}
     \item \textbf{Denominator = 1 means FIR}
     \item \textbf{Maximum phase will result in jumps in the phase plot}
     \item \textbf{Minimum phase has the greatest part of energy of the filter concentrated in the first part of the temporal samples}, which means I am introducing very small delay
+    \item \textbf{DFT of sinusoid will have peak in the freq/normalized freq depending on representation of frequency domain and another one symmetric w.r.t. Nyquist frequency}
 \end{itemize}
 

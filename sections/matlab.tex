@@ -8,7 +8,7 @@
     clc
 \end{lstlisting}
 
-\subsection{Cosine signals}
+\subsection{Sinusoid Signals}
 
     \subsubsection{Sinusoid signal continuous, in time and in samples plot}
     A sinusoid in continuous domain is
@@ -38,7 +38,9 @@
         f = 50;
         Fs = 1e3; %1000;
         Ts = 1/Fs;
-        t = 0:Ts:0.5;
+        duration = 0.5:
+        t = 0:Ts:duration;
+        t = 0:1/Fs:duration;
         phi = 30; % deg
         
         % conversion
@@ -240,7 +242,7 @@
         y = y(n_conv>=0 & n_conv <= 10);
     \end{lstlisting}
 
-\pagebreak\subsection{Z transform}
+\pagebreak\subsection{Z-transform}
 
     \subsubsection{Convolution as product in frequency domain}
     We can use conv here as well, even though the z-transform of a convolution is the product, the coefficients of the resulting polynomial are the same of the coefficients of the time domain convolution
@@ -376,15 +378,22 @@
     \begin{lstlisting}[language=Matlab, escapeinside=`']
         A_z = [2 -1 -2 1];
         B_z = [9 7 -8 -3 1 1];
-        
-        [r, p, c] = residuez(B_z, A_z); % residuez!!!
-        
         n = 0:100;
         
         delta = zeros(1, length(n));
         delta(1) = 1;
         h = filter(B_z, A_z, delta);
     \end{lstlisting}
+
+    \subsubsection{Zero-pole plot}
+    Given $y(n)=x(n)-bx(n-1)+ay(n-1)$, find the expression of $H(z)$ and plot it in the z-plane
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        B_z = [1 -b];
+        A_z = [1 -a];
+        zplane(B_z, A_z);
+    \end{lstlisting}
+
+\pagebreak\subsection{DFT}
 
 \pagebreak\subsection{Filters}
 
@@ -435,6 +444,10 @@
 
     %% Apply the filter of numerator B_z, denominator A_z to input delta
     h = filter(B_z, A_z, delta);
+
+    %% z-plane, zero-pole plot
+    zplane([1 -0.5],[1 -0.2]);
+    % A zero in 0.5 and a pole in 0.2
     %==========================================================================
     %==========================================================================
     %==========================================================================
