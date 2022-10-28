@@ -395,6 +395,191 @@
 
 \pagebreak\subsection{DFT}
 
+    \subsubsection{DFT H(f) amplitude and phase}
+    We are given:
+    $$
+    y(n)=-2y(n-1)-y(n-2)+x(n)+2\rho\cos(\theta)x(n-1)+\rho^2x(n-2)
+    $$
+    With $\rho=0.9$, $\theta=\pi/8$ and sequence defined for $n$ $[0,N-1]$, $N=1000$
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        A_z = [1 2 1]; % denominator
+        B_z = [1 2 * rho * cos(theta) rho^2];
+        N = 1000;
+        [H_omega_2pi, omega_2pi] = freqz(B_z, A_z, N, 'whole');
+
+        % plot from -pi to pi, magnitude
+        figure;
+        plot(omega_2pi - pi, fftshift(abs(H_omega_2pi)));
+        xlabel('\omega'); title('Amplitude'); grid
+
+        % plot from -pi to pi, phase
+        figure;
+        plot(omega_2pi - pi, fftshift(angle(H_omega_2pi)));
+        xlabel('\omega'); title('Phase'); grid
+    \end{lstlisting}
+
+    \subsubsection{DFT by hand with matrix}
+    Given an $h$, compute the DFT as $H=W_N\cdot h$, sequence defined for $n$ $[0,N-1]$, $N=1000$
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        N = 1e3;
+        n = 0:N - 1;
+
+        A_z = [1 2 1]; % denominator
+        B_z = [1 2 * rho * cos(theta) rho^2];
+        %% h(n)
+        delta = zeros(size(n));
+        delta(1) = 1;
+        h = filter(B_z, A_z, delta);
+        
+        W = exp(-1i * 2 * pi / N * (n' * n));
+        H_k = W * h';
+    \end{lstlisting}
+
+    \subsubsection{DFT/FFT with function}
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        H = fft(h); % careful, if filter has feedback (is IIR) this is not really DFT, we are computing a truncated version
+        h = ifft(H); 
+    \end{lstlisting}
+
+    \subsubsection{DFT plot: normalized frequency}
+    Given FIR filter $h(n)=1$, $n$ in $[0,19]$, visualize the DFT in normalized frequency $[-0.5,0.5)$
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        N = 19;
+        n_h = 0:N - 1;
+        h = ones(size(n_h));
+        
+        H_k = fft(h);
+        
+        freq_axis = 0:N - 1; % k in [0,1/N...,(N-1)/N]
+        freq_axis = freq_axis / N;
+        freq_axis = freq_axis - 0.5; % just subtract to shift it, as f normalliy in [0, 1)
+        figure;
+        stem(freq_axis, fftshift(abs(H_k)));
+        grid
+    \end{lstlisting}
+
+    \subsubsection{DFT plot: frequency}
+    Given a sinusoidal with frequency $2Hz$ and duration $1.3s$, sampled with $F_s=50$
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        f0 = 2;
+        duration = 1.3;
+        Fs = 50;
+        time = 0:1 / Fs:duration;
+
+        s = cos(2 * pi * f0 * time);
+        N = 50;
+
+        % FFT of the first 50 samples
+        S_f = fft(s(1:N));
+        freq_axis = 0:Fs / N:Fs - Fs / N;
+        figure;
+        stem(freq_axis, abs(S_f));
+
+        % DFT of entire signal
+        S_complete = fft(s);
+        N_complete = length(s);
+        freq_axis_complete = 0:Fs / N_complete:Fs - Fs / N_complete;
+        figure;
+        stem(freq_axis_complete, abs(S_complete));
+    \end{lstlisting}
+
+    \subsubsection{Zero padding}
+    Same signal of before
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        % Pad the array h(n) with zeros until reaching 100 samples
+        % Evaluate the DFT of the padded h(n) and visualize it
+        % Are the two DFTs equal? Comment on the results
+        
+        num_zeros = 100 - N;
+        h_pad = padarray(h, [0, num_zeros], 'post');
+        H_pad = fft((h_pad));
+        
+        N_pad = length(h_pad);
+        freq_axis_pad = 0:N_pad - 1;
+        freq_axis_pad = freq_axis_pad / N_pad;
+        freq_axis_pad = freq_axis_pad - 0.5;
+        
+        figure;
+        stem(freq_axis_pad, fftshift(abs(H_pad)));
+        grid
+        
+        % Why are the two DFTs different?
+        % In the second case we have more samples (we added more samples)
+        % When we add zeros it means we are windowing a signal with a rectangle
+        % Windowing = multiplying in the time
+        % In the Fourier domain we are convolving with a sort of sinc
+        % As we have a delta convolved with a signal, we get the signal
+        % Also as we introduce sinc behavior, due to summation of tails
+        % of the sinc we don't have peaks exactly at expected points
+    \end{lstlisting}
+
+    \subsubsection{DFT-periodic signals, sinusoidal}
+    Given a sinusoidal with frequency $2Hz$ defined over $N=50$ samples, sampled with $F_s=50$ and a second sinusoid with frequency $2.2Hz$, equal duration and sampling rate, compute the DFT.
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        Fs = 50;
+        N = 50;
+        time = 0:1/Fs:1/Fs*(N - 1);
+        f0 = 2;
+        f1 = 2.2;
+        s0 = cos(2 * pi * f0 * time);
+        s1 = cos(2 * pi * f1 * time);        
+        s = s0 + s1;
+                
+        % FFT of s
+        S_f = fft(s);
+        freq_axis = 0:Fs / N:Fs - Fs / N;
+        
+        figure; stem(freq_axis, abs(S_f));
+        
+        % It will show two peaks, not what we expected, we wanted 4 peaks
+        % this is due to discontinuities
+        % to see the correct peaks use zero padding
+        % To pad N_pad=k*Period
+        % P_samples_1 = Fs/f1 = 25
+        % P_samples_2 = Fs/f0 = 50/2.2 which is NOT AN INTEGER
+        % but no worries, we can find the global period as well with lcm of
+        
+        N_tot = lcm(25, 250);
+        num_pad = N_tot - N;
+        s_pad = padarray(s, [0, num_pad], 'post');
+        
+        S_pad = fft(s_pad);
+        freq_axis_pad = 0:Fs / N_tot:Fs - Fs / N_tot;
+        
+        figure; stem(freq_axis_pad, abs(S_pad));
+
+        % But the plot seems a single sinusoid, zero padding does not help here!
+        % Solution: increase #samples, that must be a multiple of the two periods
+        % P_samples_1 = Fs/f1 = 25
+        % P_samples_2 = Fs/f0 = 50/2.2
+        
+        N = 250; % == lcm(25,250)
+        time = 0:1/Fs:1/Fs*(N - 1);
+        s0 = cos(2 * pi * f0 * time);
+        s1 = cos(2 * pi * f1 * time);        
+        s = s0 + s1;
+        S_f = fft(s);
+        freq_axis = 0:Fs/N:Fs-Fs/N;
+        
+        figure; stem(freq_axis, abs(S_f));
+    \end{lstlisting}
+
+    \subsubsection{Cyclic convolution}
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        x = [0 0 1 0 0]; n_x = 0:4;
+        y = [5 4 3 2 1]; n_y = 0:4;
+        % amount of samples over which we want to compute the cyclic conv
+        N = length(x);
+
+        % linear conv
+        z = conv(x, y);
+        n_z = n_x(1) + n_y(1):n_x(end) + n_y(end);
+
+        % cyclic conv
+        z_c = cconv(x, y, N);
+        stem(0:N - 1, z_mat, '--');
+    \end{lstlisting}   
+
 \pagebreak\subsection{Filters}
 
     \subsubsection{FIR filter to attenuate signal and conjugate zero/pole}
@@ -409,7 +594,7 @@
         % 1 - 2*rho*cos(theta)z^{-1} + rho^2 z^{-2}
         B = [1, -2*cos(2*pi*f1), 4];
         y = filter(B,A,x);
-    \end{lstlisting}
+    \end{lstlisting}    
 
 \pagebreak\subsection{Functions Recap}
 \begin{lstlisting}[language=Matlab, escapeinside=`']
@@ -445,9 +630,34 @@
     %% Apply the filter of numerator B_z, denominator A_z to input delta
     h = filter(B_z, A_z, delta);
 
+
     %% z-plane, zero-pole plot
     zplane([1 -0.5],[1 -0.2]);
     % A zero in 0.5 and a pole in 0.2
+
+
+    %% DFT magnitude and phase plot
+    [H_omega_2pi, omega_2pi] = freqz(B_z, A_z, N, 'whole');
+    % plot from -pi to pi
+    plot(omega_2pi - pi, fftshift(abs(H_omega_2pi)));
+    plot(omega_2pi - pi, fftshift(angle(H_omega_2pi)));
+
+
+    %% DFT/FFT and inverse
+    H = fft(h);
+    h = ifft(H)
+
+
+    %% Pad an array
+    padarray([1 1], [0, 3], 'post');
+    % [1 1 0 0 0]
+    padarray([1 1], [2, 1], 'post');
+    % [1 1 0; 0 0 0; 0 0 0]
+
+
+    %% Cyclic convolution
+    cconv(x, y, N);
+
     %==========================================================================
     %==========================================================================
     %==========================================================================
