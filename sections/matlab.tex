@@ -395,7 +395,7 @@
 
 \pagebreak\subsection{DFT}
 
-    \subsubsection{DFT H(f) amplitude and phase}
+    \subsubsection{DFT H(f) (and H(z)) amplitude and phase}
     We are given:
     $$
     y(n)=-2y(n-1)-y(n-2)+x(n)+2\rho\cos(\theta)x(n-1)+\rho^2x(n-2)
@@ -407,10 +407,17 @@
         N = 1000;
         [H_omega_2pi, omega_2pi] = freqz(B_z, A_z, N, 'whole');
 
-        % plot from -pi to pi, magnitude
+        % plot from -pi to pi, magnitude/amplitude NOT normalized
         figure;
         plot(omega_2pi - pi, fftshift(abs(H_omega_2pi)));
         xlabel('\omega'); title('Amplitude'); grid
+
+        % amplitude in normalized frequencies in [0,1)
+        figure;
+        plot(omega/(2*pi), abs(Hap));
+
+        % amplitude in normalized frequencies in [-0.5,0.5)        
+        plot(omega/(2*pi) - 0.5, fftshift(abs(H)));
 
         % plot from -pi to pi, phase
         figure;
@@ -451,14 +458,14 @@
         H_k = fft(h);
         
         freq_axis = 0:N - 1; % k in [0,1/N...,(N-1)/N]
-        freq_axis = freq_axis / N;
+        freq_axis = freq_axis / N; % or we can define it as 0:1/N:1 - 1/N;
         freq_axis = freq_axis - 0.5; % just subtract to shift it, as f normalliy in [0, 1)
         figure;
         stem(freq_axis, fftshift(abs(H_k)));
         grid
     \end{lstlisting}
 
-    \subsubsection{DFT plot: frequency}
+    \subsubsection{DFT plot: frequency (in Hz)}
     Given a sinusoidal with frequency $2Hz$ and duration $1.3s$, sampled with $F_s=50$
     \begin{lstlisting}[language=Matlab, escapeinside=`']
         f0 = 2;
@@ -479,6 +486,7 @@
         S_complete = fft(s);
         N_complete = length(s);
         freq_axis_complete = 0:Fs / N_complete:Fs - Fs / N_complete;
+        % if shift needed, do something like freq_axis = freq_axis-Fs/2;
         figure;
         stem(freq_axis_complete, abs(S_complete));
     \end{lstlisting}
@@ -581,6 +589,144 @@
     \end{lstlisting}   
 
 \pagebreak\subsection{Filters}
+    \subsubsection{A and B from z-transform filter: conv}
+    Given the filter:
+    $$
+    H(z)=\frac{
+        2(1-z^{-1})(1+0.5z^{-1})
+    }{
+        (1-0.8e^{j\pi/4}z^{-1})(1-0.8e^{-j\pi/4}z^{-1})
+    }
+    $$
+    Derive $A(z)$ and $B(z)$
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        B = conv(2*[1, -1], [1, 0.5]);
+        A = conv([1, -0.8*exp(1i*pi/4)], [1, -0.8*exp(-1i*pi/4)]);
+    \end{lstlisting}
+
+    \subsubsection{Allpass filter}
+    Define an allpass function
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+    function [z_out, p_out, b_out, a_out] = allpass(b, a)
+        % Input: b, a = numerator and denominator of H(z)
+        % Output: z_out, p_out, b_out, a_out = zeros, poles, numerator,
+        % denominator of the allpass transfer function related to H(z)
+
+        %%  first possibility: create Hap as H(z) / tilde{H(z)}
+
+        % do this for both numerator and denominator
+        a_tilde = fliplr(conj(a));
+        b_tilde = fliplr(conj(b));
+
+        b_out = conv(b, a_tilde);
+        a_out = conv(a, b_tilde);
+
+        % usually, every filter is normalized such that a_0 = 1
+        % (but it's just a scaling operation)
+        b_out = b_out / a_out(1);
+        a_out = a_out / a_out(1);
+
+        z_out = roots(b_out);
+        p_out = roots(a_out);
+    end
+    \end{lstlisting}
+
+    \subsubsection{Stability check}
+    For a filter to be stable, all poles must be inside the unit circle
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        stability_check = all(abs(p_ap) < 1);
+        % or (~ is logical complement)
+        stability_check = ~any(abs(p_ap) > 1);
+    \end{lstlisting}
+
+    \subsubsection{Minimum and maximum phase check}
+    For a filter to be maximum phase, at least one zero is outside the unit circle
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        function [filter_type] = typeOfFilter(b, a)
+            % compute zeroes and poles
+            zeroes = roots(b);
+            poles = roots(a);
+        
+            % stability is related to poles only
+        
+            if any(abs(poles) > 1)
+                filter_type = -1;
+            else
+                % the system is stable
+                % check if it is minimum phase
+                % also zeros must be inside the unit circle
+                if any(abs(zeroes) > 1)
+                    % the system is not minimum phase
+                    filter_type = 0;
+                else
+                    % the system is minimum phase
+                    filter_type = 1;
+                end        
+            end
+        end
+    \end{lstlisting}
+
+    \subsubsection{Minimum phase-allpass decomposition}
+    Properties of allpass: \textbf{Any rational causal stable system can be decomposed into the multiplication of a minimum phase system and an allpass system}
+    $$
+    H(z)=H_{min}(z)H_{ap}(z)
+    $$
+    Causal and stable, so all poles are inside the unit circle!\\
+    $H_{min}(z)$ contains:
+    \begin{itemize}
+        \item The poles and the zeros of $H(z)$ that lie inside the unit circle
+        \item Zeros that are conjugate reciprocals of the zeros $H(z)$ lying outside the unit circle
+    \end{itemize}
+    $H_{ap}(z)$ contains:
+    \begin{itemize}
+        \item All the zeros of $H(z)$ that lie outside the unit circle
+        \item Poles that are conjugate reciprocals of the zeros of $H(z)$ lying outside the unit circle
+    \end{itemize}
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        B = [1, -1.98, 1.77, -0.17, 0.21, 0.34];
+        A = [1, 0.08, 0.40, 0.27];
+        
+        % all-pass minimum phase decomposition
+        zeroes = roots(B);
+        poles = roots(A);
+        
+        % zeros and poles which are already minimum phase
+        z_min = zeroes(abs(zeroes) <= 1);
+        p_min = poles(abs(poles) <= 1);
+        
+        % check if there are zeroes outside the unit circle, maximum phase
+        if any(abs(zeroes) > 1)
+            % allpass decomposition
+            z_ap = zeroes(abs(zeroes) > 1); % extract the maximum phase zeroes
+            p_ap = 1 ./ conj(z_ap); % poles of allpass compensate for the zeros
+        
+            % minimum phase part
+            % include other zeros = p_ap in the minimum phase filter
+            z_min = [z_min; p_ap];
+        
+            % define the polynomials related to the all pass filter
+            B_ap = poly(z_ap);
+            A_ap = poly(p_ap);
+        else %system is minimum phase
+            B_ap = 1;
+            A_ap = 1;
+        end
+        
+        % define the polynomials related to the minimum phase filter
+        B_min = poly(z_min);
+        A_min = poly(p_min);
+        
+        % multipy by c_0 if want amplitude of allpass = 1
+        c_0 = sum(A_ap) / sum(B_ap);
+        B_ap = c_0 * B_ap;
+        
+        % divide Hmin by c_0, so to compensate the multiplication before
+        B_min = B_min / c_0;
+        
+        %% check on zplane
+        figure; zplane(B_min, A_min); grid; title("Minimum phase component");        
+        figure; zplane(B_ap, A_ap); grid; title("Allpass component");
+    \end{lstlisting}
 
     \subsubsection{FIR filter to attenuate signal and conjugate zero/pole}
     You are given two zeros with absolute value equal to 2 in complex conjugate position, build a FIR filter in order to attenuate a signal with frequency $f_1=\cdots$
@@ -594,7 +740,149 @@
         % 1 - 2*rho*cos(theta)z^{-1} + rho^2 z^{-2}
         B = [1, -2*cos(2*pi*f1), 4];
         y = filter(B,A,x);
-    \end{lstlisting}    
+    \end{lstlisting}
+
+    \subsubsection{Windowing}
+    Given $x$ as a consine wave sampled at $F_s=8kHz$, defined from 0 to 1 second, amplitude $1.5$, frequency $1.1kHz$, phase $45 deg$. Compute $y$ as $x$ filtered with a low-pass filter with normalized cutoff frequency of $0.4$ and 64 samples.
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        Fs = 8e3; duration = 1; A = 1.5; f0 = 1.1e3; phase = pi/4;
+        time = 0:1/Fs:duration;
+
+        N_filter = 64;
+        filter_order = N_filter - 1;
+        cutoff = 0.4;
+        cutoff_filter = cutoff * 2; % matlab cutoff always twice of desired
+
+        h = fir1(filter_order, cutoff_filter);
+        y = filter(h, 1, x); % as FIR, we put 1 as denominator
+    \end{lstlisting}
+    Apply a Hanning window to select the first 512 samples of $y$, then plot the DFT of the windowed $y$ vs frequency in Hz, defined in $[-F_s/2,F_s/2]$
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        Nw = 512;
+        w = window(@hann, Nw); % or hann(Nw);
+        y_w = y(1:Nw) .* w'; % multiply element wise
+        
+        %% we can try to exam some common windows behaviour
+        w1 = rectwin(64);
+        w2 = bartlett(64); % triangular
+        w3 = hamming(64);
+        w4 = blackman(64);
+        % open window tool
+        wvtool(w1, w2, w3, w4);
+        
+        % compute DFT
+        Yw = fft(y_w);
+        freq_axis = 0:Fs/Nw:Fs-Fs/Nw;
+        freq_axis = freq_axis-Fs/2;
+        figure;
+        plot(freq_axis, Yw);
+    \end{lstlisting}
+    
+\pagebreak\subsection{Multirate}
+    \subsubsection{Downsampling and decimation}
+    Given a signal $x(n)$, downsample with factor $M=4$, decimate it with a decimation factor of $M=4$, using a FIR filter with order 64.
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        Fs = 500; f_0 = 50; f_1 = 100; duration = 3; time = 0:1 / Fs:duration;
+        x = cos(2 * pi * f_0 * time) + cos(2 * pi * f_1 * time);
+
+        M = 4;
+
+        % LPF
+        cut_off = 1 / (2 * M);
+        cut_off_filter = 2 * cut_off;
+        lpf = fir1(64, cut_off_filter);
+
+        x_f = filter(lpf, 1, x); % FIR
+
+        % decimate
+        x_decimated = x_f(1:M:end); % just specify a step size of M
+
+        % As original pulse in 50 Hz, after downsampling with M = 4
+        % we will find a pulse/peak in 4*50=200. Same goes for 100*4 = 400
+        % Without decimation we have aliasing at freq 100 (and its symmetric 400)
+        % With lpf we will not have contributions of 100 and 400, as cutoff was
+        % 1/(2M) = 1/8. BUT as we are in Hz, 1/8*Fs=1/8*500 = 62.5, so any freq
+        % higher than that removed (100 > 62.5 removed, so its symmetric removed as well)
+        % BM < Fs/2 -> 50*4 < 250 yes, but 100*4 < 250 NO
+    \end{lstlisting}
+
+    \subsubsection{Upsampling and interpolation}
+    Given the downsampled signal from before, without lpf first, decimate it with a decimation factor of $M=4$, using a FIR filter with order 64.
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        % Starting signal, from before
+        Fs = 500; f_0 = 50; f_1 = 100; duration = 3; time = 0:1 / Fs:duration;
+        x = cos(2 * pi * f_0 * time) + cos(2 * pi * f_1 * time);
+        M = 4;
+        x_downsampled = x_f(1:M:end); % starting signal, applied downsample without lpf
+
+        % Upsample it WITHOUT applyting lpf at the end
+        L = 4;
+        x1 = zeros(1, length(x_downsampled) * L);
+        x1(1:L:end) = x_downsampled;
+    \end{lstlisting}
+    Given the same downsampled signal, but this time with lpf applied, upsample with interpolation
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        % Starting signal, downsampled signal with lpf this time
+        cut_off = 1 / (2 * M);
+        cut_off_filter = 2 * cut_off;
+        lpf = fir1(64, cut_off_filter);
+        x_f = filter(lpf, 1, x);
+        x_decimated = x_f(1:M:end);
+
+        % Upsample it and then apply lpf
+        L = 4;
+        x2 = zeros(1, length(x_decimated) * L);
+        x2(1:L:end) = x_decimated;
+
+        lpf = fir1(64, 1/L); % cut_off = 2*(1/(2*L))=1/L
+        % remember to put the gain L in interpolation
+        x2 = L*filter(lpf, 1, x2); % MULTIPLY AGAIN BY L
+
+        % at the end, I WILL NOT OBTAIN THE ORIGINAL SIGNAL, i lost info
+        % as I downsampled to avoid aliasing (aliasing makes me lose information)
+        % At the end only in f0 we will find a sinusoidal contribution
+        % we also will find a delay at the beginning (many zeros at the beginning)
+        % This is because every filter in real life is a causal filter, so in the final
+        % output will be delay (phase related with delay) -> lpf's introduce delay
+        % x(n) -> [LPF*LPF] -> y(n)
+        % The convolution of those two LPF's introduce delay
+        % If we inspect the maximum peak in freq domain of the convolution/mutiplication
+        % as the peak is not in 0, but e.g. 65, a delay will be introduced
+        % To find the delay: 
+        % [max_filter, filter_delay] = max(conv(lpf,lpf));
+        % filter_delay is the position of the max, so delay
+        % So to delete delay:
+        % actual_signal = cos(2*pi*f*(time(1:N)-time(filter_delay)));
+
+        [max_filter, filter_delay] = max(conv(lpf, lpf)); % lpf_up == lpf_down in this case
+        actual_signal = cos(2*pi*f_0 * (time(1:N) - time(filter_delay)));
+    \end{lstlisting}
+
+    \subsubsection{Rational sampling rate conversion: noninteger factor}
+    Given the signal $x(t)=A_1\cos(2\pi f_1t)+A_2\cos(2\pi f_2t)$, create the signal $x(n)$ as $x(t)$ from 0 to 0.5 seconds, sampled at $F_s=8000Hz$, $A_1=0.7$, $A_20+=0.5$, $f_1=1800Hz$, $f_2=3600Hz$. Then create the signal $y(n)$ by resampling $x(n)$ with $6000Hz$, suing $N=64$ filter samples;
+    \begin{lstlisting}[language=Matlab, escapeinside=`']
+        duration = 0.5; Fs = 8e3; time = 0:1/Fs:duration;
+        A1 = 0.7; f1 = 1800;
+        A2 = 0.5; f2 = 3600;
+
+        x = A1*cos(2*pi*f1*time) + A2*cos(2*pi*f2*time);
+
+        % 8000 -> 24000 -> 6000
+        L = 3; M = 4; % or use [L, M] = rat(Fs_new / Fs); 
+
+        % Upsample
+        x_upsampled = zeros(1, length(x) * L);
+        x_upsampled(1:L:end) = x;
+
+        % LPF with cutoff of min(1/(2L),1/(2M))
+        cutoff = min([1/(2*L), 1/(2*M)]);
+        cutoff_filter = 2*cutoff;
+        h = fir1(64-1, cutoff_filter);
+        x_f = L*filter(h, 1, x_upsampled);
+
+        % Downsample
+        y = x_f(1:M:end);
+    \end{lstlisting}
 
 \pagebreak\subsection{Functions Recap}
 \begin{lstlisting}[language=Matlab, escapeinside=`']
@@ -624,7 +912,7 @@
     %% Partial fract expansion
     A_z = [2 -1 -2 1];
     B_z = [9 7 -8 -3 1 1];
-    [r , p , c ] = residuez ( B_z , A_z );
+    [r , p , c ] = residuez(B_z, A_z);
 
 
     %% Apply the filter of numerator B_z, denominator A_z to input delta
@@ -658,8 +946,13 @@
     %% Cyclic convolution
     cconv(x, y, N);
 
-    %==========================================================================
-    %==========================================================================
-    %==========================================================================
-    %==========================================================================
+
+    %% Invert an array
+    fliplr([1 2 3 4])
+    % [4 3 2 1]
+
+    
+    %% Get numerator and denominator of a fraction
+    [L, M] = rat(6000 / 8000); 
+    % [3, 4]
 \end{lstlisting}
