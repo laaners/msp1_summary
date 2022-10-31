@@ -173,25 +173,69 @@
         \end{center}
     }
 
-\pagebreak\subsection{20220217-2*}
+\pagebreak\subsection{20220217-2}
     A signal $x(t)=\sin(2\pi 100t)+2\cos(2\pi 50t)$ is sampled at $400Hz$ and then downsampled by an order of $M=3$
 
-    \subsubsection{Downsampling without LPF}
+    \subsubsection{Downsampling without LPF, DFT of a sinusoid: peaks and pulses}
     [5pts] What is the output in case of no low pass (antialiasing) filter is adopted? Depict the magnitude of the output in the range $0-\pi$ (normalized frequencies).
 
     \mybox{
+        Suppose we have $N$ samples, the sampled signal is
         $$
-        F_s=400
+        x[n]=2\cos\left(\frac{\pi}{4}n\right)+\sin\left(\frac{\pi}{2}n\right)
         $$
-        The sampled signal is
+        Computing its DFT, as it is a sinusoid, we will have 4 pulses, 2 at $\frac{\pi}{2}$ and its symmetric w.r.t. the Nyquist frequency, 2 at $\frac{\pi}{4}$ and its symmetric. As the contribution on $\frac{\pi}{2}$ (the cosine) is twice the contribution of the sine, the pulse at $\frac{\pi}{2}$ will be halve the size of the other.
         $$
-        x[n]=\sin(\frac{\pi}{2}n)+2\cos(\frac{\pi}{4}n)
+        |X(\omega)|=
+        \delta\left(\omega-\frac{\pi}{4}\right)
+        +\delta\left(\omega-2\pi+\frac{\pi}{4}\right)
+        +\frac{1}{2}\delta\left(\omega-\frac{\pi}{2}\right)
+        +\frac{1}{2}\delta\left(\omega-2\pi+\frac{\pi}{2}\right)
         $$
-        So after downsampling:
+        After downsampling:
         $$
-        x_d[n]=x[nM]=\sin(\frac{3\pi}{2}n)+2\cos(\frac{3\pi}{4}n)
+        x_d[n]=x[nM]=
+        2\cos\left(\frac{3\pi}{4}n\right)
+        +\sin\left(\frac{3\pi}{2}n\right)
         $$
+        Its DFT will be:
+        $$
+        X_d(\omega)=\frac{1}{M}\sum_{k=0}^{M-1}X\left(\frac{\omega-k}{M}\right)
+        $$
+        Or alternatively write the DFT of $x_d[n]$ normally and add a $\frac{1}{3}$ factor
+        $$
+        |X_d(\omega)|=
+        \frac{1}{3}\left[
+        \delta\left(\omega-\frac{3\pi}{4}\right)
+        +\delta\left(\omega-2\pi+\frac{3\pi}{4}\right)
+        +\frac{1}{2}\delta\left(\omega-\frac{3\pi}{2}\right)
+        +\frac{1}{2}\delta\left(\omega-2\pi+\frac{3\pi}{2}\right)
+        \right]
+        $$
+        $$        
+        |X_d(\omega)|=
+        \frac{1}{3}\left[
+        \delta\left(\omega-\frac{3\pi}{4}\right)
+        +\delta\left(\omega-\frac{5\pi}{4}\right)
+        +\frac{1}{2}\delta\left(\omega-\frac{3\pi}{2}\right)
+        +\frac{1}{2}\delta\left(\omega-\frac{\pi}{2}\right)
+        \right]
+        $$
+        As we are only interested in the range $[0,\pi]$, only the following pulses remain:
+        $$        
+        |X_d(\omega)|=
+        \frac{1}{3}\left[
+        \delta\left(\omega-\frac{3\pi}{4}\right)
+        +\frac{1}{2}\delta\left(\omega-\frac{\pi}{2}\right)
+        \right]
+        $$
+    }
 
+    \subsubsection{Cutoff for LPF}
+    Suggests a possible low pass filter describing its behavior and the cutoff frequency justifying the choice: what will be the offect on the output signal?
+
+    \mybox{
+        We introduce a cutoff of $\omega=\frac{\pi}{M}=\frac{\pi}{3}$ in order to avoid aliasing.
     }
 
 \pagebreak\subsection{20220126-1}
@@ -256,7 +300,7 @@
         $
     }
 
-\pagebreak\subsection{20211108-1}
+\pagebreak\subsection{20211108-1*}
 
     \subsubsection{Zero-pole to equation in z}
 
@@ -265,6 +309,111 @@
         H_m(z)=1+0.49z^{-2}
         $$
     }
+
+\pagebreak\subsection{20211108-2}
+    A continuous signal composed of two sinusoids $y(t)=10\cos(2\pi\cdot 50t)+5\sin(2\pi\cdot 75t)$ is sampled at $200Hz$ with an ideal sampler
+    
+    \subsubsection{Upsample by noninteger detailed pipeline}
+    [2pts] We need to change its sample rate to 300 samples per second: describe, to processing chain in order to get the desired result from a quantitative viewpoint (providing values used in each step)
+
+    \mybox{
+        \begin{center}
+            \includegraphics[width=0.8\textwidth]{images/20211108_21.png}
+        \end{center}
+        The sampled signal is:
+        $$
+        x[n]=10\cos\left(\frac{\pi}{2}n\right)+5\sin\left(\frac{3\pi}{4}n\right)
+        $$
+        We know that the DFT of a sinusoid will introduce two symmetric pulses at $\pm\tilde{f}_0$, so in this case we will have 4 pulses, two of which is half the magnitude of the other:
+        $$
+        X(f)=
+        \delta\left(f-\frac{\pi}{2}\right)
+        +\frac{1}{2}\delta\left(f-\frac{3\pi}{4}\right)+
+        \underlabel{
+            \delta\left(f-\left(2\pi-\frac{\pi}{2}\right)\right)+
+            \frac{1}{2}\delta\left(f-\left(2\pi-\frac{3\pi}{4}\right)\right)
+        }{symmetric pulses}
+        $$
+        The upsampled signal is:
+        $$
+        x_u[n]=10\cos\left(\frac{\pi}{6}n\right)+5\sin\left(\frac{\pi}{4}n\right)
+        $$
+        The DFT will be $X_u(f)=X(fL)$, or alternatively we know that the peaks are in $\frac{\tilde{\omega}+2\pi k}{L}$
+        $$
+        X_u(f)=
+        \begin{cases}
+            \delta\left(f-\frac{\pi/2}{3}\right)
+            +\delta\left(f-\frac{\pi/2+2\pi}{3}\right)
+            +\delta\left(f-\frac{\pi/2+4\pi}{3}\right)\\
+            +\frac{1}{2}\delta\left(f-\frac{3\pi/4}{3}\right)
+            +\frac{1}{2}\delta\left(f-\frac{3\pi/4+2\pi}{3}\right)
+            +\frac{1}{2}\delta\left(f-\frac{3\pi/4+4\pi}{3}\right)\\
+            +\underlabel{\cdots\cdots\cdots}{symmetric pulses}
+        \end{cases}
+        $$
+        $$
+        X_u(f)=
+        \delta\left(f-\frac{\pi}{6}\right)
+        +\delta\left(f-\frac{5\pi}{6}\right)
+        +\delta\left(f-\frac{9\pi}{6}\right)
+        +\frac{1}{2}\left[\delta\left(f-\frac{\pi}{4}\right)
+        +\delta\left(f-\frac{11\pi}{12}\right)
+        +\delta\left(f-\frac{19\pi}{12}\right)\right]
+        $$
+        $$
+        +\underlabel{\cdots\cdots\cdots}{symmetric pulses}        
+        $$
+        We can limit our analysis to $[0,\pi]$, so $X_u(f)$ becomes:
+        $$
+        X_u(f)=
+        \delta\left(f-\frac{\pi}{6}\right)
+        +\delta\left(f-\frac{3\pi}{6}\right)
+        +\delta\left(f-\frac{5\pi}{6}\right)
+        +\frac{1}{2}\left[\delta\left(f-\frac{\pi}{4}\right)
+        +\delta\left(f-\frac{5\pi}{12}\right)
+        +\delta\left(f-\frac{11\pi}{12}\right)\right]
+        $$
+        We then apply a LPF with cutoff of $\min\left[\frac{\pi}{3},\frac{\pi}{2}\right]=\frac{\pi}{3}$, which will keep all pulses before the cutoff and remove all pulses after it:
+        $$
+        X_{LP}(f)=
+        \delta\left(f-\frac{\pi}{6}\right)
+        +\frac{1}{2}\delta\left(f-\frac{\pi}{4}\right)
+        $$
+    }
+    \pagebreak
+
+    \mybox{
+        At the end we apply downsampling with $M=2$
+        $$
+        X_d(f)=\frac{1}{2}\left[
+            \delta\left(f-\frac{\pi}{3}\right)+
+            \frac{1}{2}\delta\left(f-\frac{\pi}{2}\right)
+        \right]
+        $$
+        \begin{center}
+            \includegraphics[width=1\textwidth]{images/20211108_22.png}
+        \end{center}
+        Where $N=200$ was arbitrarly chosen, the number of samples only influences the Y-axis
+    }
+
+    \subsubsection{Non-ideal lowpass filter for rational sampling: aliasing}
+    [6pts] In order to get the result we can simply use a lowpass filter whose frequency behavior is depicted in the following graph:
+    \begin{center}
+        \includegraphics[width=1\textwidth]{images/20211108_23.png}
+    \end{center}
+    The magnitude decreases linearly from 1 at $\omega=0$ to 0 at $\omega=\pi$ and the phase is null for the whole spectrum.\\
+    Describe the output signal underlining the impact (gain/attenuation) of such a filter on the signal componenets and on the spurious components due to the sample rate change.
+
+    \mybox{
+        As the lowpass filter is not ideal, some pulses after the cutoff frequency of $\frac{\pi}{3}$ will not be removed completely, but they will be attenuated. The presence of such pulses, even if their amplitude will be low, will introduce aliasing as seen below:
+        \begin{center}
+            \includegraphics[width=1\textwidth]{images/20211108_24.png}
+        \end{center}
+    }
+
+
+
+
 
 \pagebreak\subsection{20190910-2}
     A signal $x[n]=\Brackets{-1,-1,2,0,0,1,-2,1,0,1,1,-1}$ shall be filtered with this FIR fitler: $h[n]=\Brackets{1,-1,2}$.\\

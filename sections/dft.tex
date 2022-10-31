@@ -133,8 +133,21 @@ So the Alternative is to redefine the signals in time domain with samples equal 
 \subsection{Discontinuity}
 In the Fourier domain introduces high frequency content
 
-\subsection{$\delta$ and sinusoids (peaks of cosines)}
-A sinusoid (a cosine) with frequency $f_0$ will have two $\delta$'s in the frequency domain, one at $f_0$ the other at $-f_0$. If we add a second signal with a different frequency $f_0'$, we will have two additions $\delta$'s at $f_0'$ and $-f_0'$.
+\subsection{DFT of sinusoids: pulses and peaks}
+A sinusoid (a cosine) with frequency $f_0$ will have two $\delta$'s in the frequency domain, one at $f_0$ the other at $-f_0=F_s-f_0$ (mirrored w.r.t. $F_s/2$ Nyquist, if normalized frequencies, it is at $1-\tilde{f}_0$, $\pm\tilde{\omega}_0$). If we add a second signal with a different frequency $f_0'$, we will have two additions $\delta$'s at $f_0'$ and $-f_0'$. In the magnitude/amplitude plot, the two pulses will have $\frac{N}{2}$ height
+
+Given a sinusoid with $F_s$ [Hz] and $f_0$ [Hz], its DFT will have two peaks, one in $f_0$, the other one in $F_s-f_0$, symmetric w.r.t. the Nyquist frequency. For example, given:
+$$
+x(t) = A*\cos(2\pi f_0t)\qquad F_s = 50Hz\qquad f_0 = 2Hz
+$$
+$$
+x(n) = A*\cos\left(\frac{2\pi}{25}n\right)
+$$
+Its DFT is:
+$$
+|X(\omega)|=\frac{N}{2}\delta\left(\omega-\frac{2\pi}{25}\right)+
+\frac{N}{2}\delta\left(\omega-\left(2\pi-\frac{2\pi}{25}\right)\right)
+$$
 
 \subsection{DFT and IDFT periodicty}
 Given a non periodic sequence $x(n)$ defined over $N$ samples, its $N$-periodic extension is defined as:
