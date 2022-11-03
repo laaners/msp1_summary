@@ -17,6 +17,9 @@
     The DTFT if $y(n)$ is composed of copies of the DTFT of $x(n)$ \textbf{expanded by M and repeated with period 1} in normalized frequency (or $F_s$ in Hertz, or $2\pi$ in angular frequencies)
 
     \textbf{The gain is reduced by a factor of M}.
+    
+    \textbf{In practice the DFT of a downsampled sinusoid will be the pulses evaluated at $\tilde{\omega}\cdot M$ with a gain reduced by $M$: $A\rightarrow \frac{A}{M}$, remember to add the symmetric pulse for each!}
+
     \subsubsection{Aliasing}
     \begin{center}
         \includegraphics[width=0.9\textwidth]{images/downsampling_aliasing.png}
@@ -60,6 +63,7 @@
     $$
     Upsampling compresses the DTFT by a factor of $L$, \textbf{if we upsampled a sinusoid, its DFT will repeat the pulses every $L$, same goes for the symmetric pulses}.
 
+    \textbf{In practice the DFT of an upsampled sinusoid will be the pulses evaluated at $\frac{\tilde{\omega}+2\pi k}{L}$, where $k=0,1,\cdots,L-1$, remember to add the symmetric pulse for each!}
 
     \subsubsection{Replicas}
     \begin{center}

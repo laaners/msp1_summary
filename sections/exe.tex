@@ -238,7 +238,7 @@
         We introduce a cutoff of $\omega=\frac{\pi}{M}=\frac{\pi}{3}$ in order to avoid aliasing.
     }
 
-\pagebreak\subsection{20220126-1}
+\pagebreak\subsection{20220126-1*}
     We need to apply the first derivative ($h[n]=\Brackets{1,-1}$) in real-time to a digital signal $x[n]=\Brackets{1,2,0,1,0,1,\cdots}$ working in the frequency domain on blocks of 4 samples.
 
     \subsubsection{DFT}
@@ -300,13 +300,110 @@
         $
     }
 
-\pagebreak\subsection{20211108-1*}
+\pagebreak\subsection{20211108-1}
+    A digital filter $H_m(z)$ is a minimum phase filter with the following pole-zero diagram:
+    \begin{center}
+        \includegraphics[width=0.7\textwidth]{images/20211108_11.png}
+    \end{center}
 
     \subsubsection{Zero-pole to equation in z}
+    [3pts] Provide the equation of $H_m(z)$ in $z$
 
+    \mybox{
+        We use:
+        $$
+        1-2\rho\cos(\theta)+\rho^2\qquad\rho=0.7,\,\,\theta=\pm\frac{\pi}{2}
+        $$
+        $$
+        H_m(z)=1+0.49z^{-2}
+        $$
+    }
+
+    \subsubsection{Magnitude and phase plot by hand}
+    [3pts] Provide an approximate representation of its magnitude and phase response finding the exact values for $\omega=0,\,\,\pi/2,\,\,\pi$
+
+    \mybox{
+        Magnitude:
+        \begin{itemize}
+            \item $\omega=0\rightarrow z=1\rightarrow H_m(1)=1.49$
+            \item $\omega=\pi/2\rightarrow z=j\rightarrow H_m(j)=0.51$
+            \item $\omega=\pi\rightarrow z=-1\rightarrow H_m(-1)=1.49$
+        \end{itemize}
+        \begin{center}
+            \includegraphics[width=0.8\textwidth]{images/20211108_12.png}
+        \end{center}
+    }
+
+    \pagebreak
     \mybox{
         $$
         H_m(z)=1+0.49z^{-2}
+        $$
+        Phase:
+        \begin{itemize}
+            \item $\omega=0\rightarrow z=1\rightarrow$ 0 due to opposite contributions of zeros
+            \item $\omega=\pi/2\rightarrow z=j\rightarrow H_m(j)=0.51$, whose angle is 0 as well
+            \item $\omega=\pi\rightarrow z=-1\rightarrow$ 0 due to opposite contributions of zeros
+        \end{itemize}
+        Additional values for plotting:
+        \begin{itemize}
+            \item $\omega=\pi/4\rightarrow z=\frac{\sqrt{2}}{2}+j\frac{\sqrt{2}}{2}$
+            $$
+            H_m(z)=1-0.49j\rightarrow\angle(1+0.49j)\sim -26^\circ\sim -0.45
+            $$
+            \item $\omega=3\pi/4\rightarrow z=-\frac{\sqrt{2}}{2}+j\frac{\sqrt{2}}{2}$
+            $$
+            H_m(z)=1+0.49j\rightarrow\angle(1-0.49j)\sim 26^\circ\sim 0.45
+            $$
+        \end{itemize}
+        \begin{center}
+            \includegraphics[width=0.9\textwidth]{images/20211108_13.png}
+        \end{center}
+    }
+
+    \subsubsection{Define maximum phase filter with fixed amplitude}
+    [3pts] Provide the equation of $H_M(z)$ with the proper gain
+
+    \mybox{
+        We write the $G$ version:
+        $$
+        H_M(z)=z^{-N}H_m^*(z^{-1})=0.49+z^{-2}
+        $$
+    }
+
+    \pagebreak
+
+    \subsubsection{Allpass filter}
+    [3pts] Provide the equation of $H_A(z)$, what will be the effect on the phase at $\omega=0,\,\,\pi/2,\,\,\pi$?
+
+    \mybox{
+        $$
+        H_A(z)=\frac{H_m(z)}{H_M(z)}=\frac{1+0.49z^{-2}}{0.49+z^{-2}}
+        $$
+        The phase will 
+        The phase:
+        \begin{itemize}
+            \item $\omega=0\rightarrow z=1\rightarrow H_A(1)=\frac{1.49}{0.49}$ whose angle is 0
+            \item $\omega=\pi/2\rightarrow z=j\rightarrow H_A(j)=\frac{0.51}{-0.51}=-1$, whose angle is $\pi$
+            \item $\omega=\pi\rightarrow z=-1\rightarrow H_A(-1)=H_A(1)$ whose angle is 0
+        \end{itemize}
+        \begin{center}
+            \includegraphics[width=1\textwidth]{images/20211108_14.png}
+        \end{center}
+    }
+
+    \subsubsection{Difference equation}
+    [3pts] Provide the finite difference equation $y[n]=\cdots$ of the $H_A(z)$
+
+    \mybox{
+        $$
+        H_A(z)=\frac{1+0.49z^{-2}}{0.49+z^{-2}}
+        $$
+        $$
+        0.49y[n]+y[n-2]=x[n]+0.49x[n-2]
+        $$
+        $$
+        y[n]=-\frac{1}{0.49}y[n-2]+\frac{1}{0.49}x[n]+x[n-2]        
         $$
     }
 
@@ -411,6 +508,91 @@
         \end{center}
     }
 
+\pagebreak\subsection{20200218-1}
+    A filter $H(z)$ has the following zero-pole plot:
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{images/20200218_11.png}
+    \end{center}
+    Where the distance of every pole from the origin is $\frac{1}{2}$.
+
+    \subsubsection{Z-transform and pole-zero plot}
+    [2pts] Which kind of filter is it (FIR or IIR)? Is it stable or unstable? Is it causal or not?
+
+    [2pts] Provide its z-transform $H(z)$
+
+    \mybox{
+        It is a pure IIR filter, stable and causal (since the number of zeros, to be causal, cannot be greater than the number of poles)
+        Using $1-2\rho\cos\theta+\rho^2$, we find
+        $$
+        H(z)=\frac{1}{
+            \left(1+\frac{\sqrt{2}}{2}z^{-1}+\frac{1}{4}z^{-2}\right)
+            \left(1-\frac{\sqrt{2}}{2}z^{-1}+\frac{1}{4}z^{-2}\right)        }
+        $$
+        $$
+        H(z)=\frac{1}{1+\frac{1}{16}z^{-4}}
+        $$
+    }
+
+    \subsubsection{Difference equation}
+    [2pts] Provide its difference equation
+
+    \mybox{
+        $$
+        y(n)=x(n)-\frac{y(n-4)}{16}
+        $$
+    }
+
+    \subsubsection{Filter schema drawing}
+    [3pts] Draw a schematic for the filter implementation
+
+    \mybox{
+        \begin{center}
+            \includegraphics[width=0.4\textwidth]{images/20200218_12.png}
+        \end{center}
+    }
+
+    \subsubsection{Output samples: IIR}
+    [3pts] Provide the first 9 outputs of the filter for the impulse response $x(n)=\Brackets{1,0,0,\cdots}$
+
+    [3pts] Provide the first 9 outputs of the filter for the step function response $x(n)=\Brackets{1,1,1,\cdots}$
+
+    \mybox{
+        As we have the difference equation of $y(n)$, we compute the output samples by hand.
+        $$
+        y(n)=x(n)-\frac{y(n-4)}{16}
+        $$
+        As for $n<0$ the system does not exist:
+        \begin{itemize}
+            \item Impulse response
+            $$
+            \begin{cases}
+                y(0)=x(0)=1\\
+                y(1)=x(1)=0\\
+                y(2)=x(2)=0\\
+                y(3)=x(3)=0\\
+                y(4)=x(4)-\frac{1}{16}y(0)=-\frac{1}{16}\\
+                y(5)=x(5)-\frac{1}{16}y(1)=0\\
+                y(6)=x(6)-\frac{1}{16}y(2)=0\\
+                y(7)=x(7)-\frac{1}{16}y(3)=0\\
+                y(8)=x(8)-\frac{1}{16}y(4)=\left(-\frac{1}{16}\right)^2
+            \end{cases}
+            $$
+            \item Step function response
+            $$
+            \begin{cases}
+                y(0)=x(0)=1\\
+                y(1)=x(1)=1\\
+                y(2)=x(2)=1\\
+                y(3)=x(3)=1\\
+                y(4)=x(4)-\frac{1}{16}y(0)=\frac{15}{16}\\
+                y(5)=x(5)-\frac{1}{16}y(1)=\frac{15}{16}\\
+                y(6)=x(6)-\frac{1}{16}y(2)=\frac{15}{16}\\
+                y(7)=x(7)-\frac{1}{16}y(3)=\frac{15}{16}\\
+                y(8)=x(8)-\frac{1}{16}y(4)=1-\frac{1}{16}\frac{1}{15}
+            \end{cases}
+            $$
+        \end{itemize}
+    }
 
 
 
@@ -662,12 +844,12 @@
         H_1(z)=\frac{1-\cos(\bigslant{\pi}{5})z^{-1}}{1-2\cos(\bigslant{\pi}{5})z^{-1}+z^{-2}}\\
         \\
         y_1(n)-2\cos(\bigslant{\pi}{5})y(n-1)+y(n-2)=
-        1-\cos(\bigslant{\pi}{5})x(n-1)\\
+        x(n)-\cos(\bigslant{\pi}{5})x(n-1)\\
         \\
         H_2(z)=\frac{1-\cos(\bigslant{4\pi}{5})z^{-1}}{1-2\cos(\bigslant{4\pi}{5})z^{-1}+z^{-2}}\\
         \\
         y_2(n)-2\cos(\bigslant{4\pi}{5})y(n-1)+y(n-2)=
-        1-\cos(\bigslant{4\pi}{5})x(n-1)\\
+        x(n)-\cos(\bigslant{4\pi}{5})x(n-1)\\
         $
     }
 
@@ -729,6 +911,125 @@
         \begin{center}
             \includegraphics[width=1\textwidth]{images/20190212_22.png}
         \end{center}
+    }
+
+\pagebreak\subsection{20190116-1}
+    A digital signal is made of 3 samples: $x[n]=\Brackets{2,3,-1}$. Working \underline{exclusively} in the Discrete frequencies domain, we want to find its continuous component (0 frequency) removing the high frequencies.
+
+    \subsubsection{DFT to remove the high frequencies}
+    [3pts] Define the $W$ matrix to perform the DFT of the 3 samples signal.
+
+    [2pts] Calculate $X[k]$, the DFT of the input signal
+
+    [3pts] Define the filter $H[k]$ in the frequency domain in order to remove the high frequencies and extract the filtered signal $Y[k]$
+
+    \mybox{
+        $$
+        W_i=e^{-j\frac{2\pi}{i}}\qquad i=3
+        $$
+        $$
+        W=
+        \begin{bmatrix}
+            1 & 1 & 1\\
+            1 & W_i^1 & W_i^2\\ 
+            1 & W_i^2 & W_i^4 
+        \end{bmatrix}=
+        \begin{bmatrix}
+            1 & 1 & 1\\
+            1 & -\frac{1}{2}-j\frac{\sqrt{3}}{2} & -\frac{1}{2}+j\frac{\sqrt{3}}{2}\\
+            1 & -\frac{1}{2}+j\frac{\sqrt{3}}{2} & -\frac{1}{2}-j\frac{\sqrt{3}}{2}
+        \end{bmatrix}
+        $$
+        $$
+        X[k]=
+        \begin{bmatrix}
+            1 & 1 & 1\\
+            1 & -\frac{1}{2}-j\frac{\sqrt{3}}{2} & -\frac{1}{2}+j\frac{\sqrt{3}}{2}\\
+            1 & -\frac{1}{2}+j\frac{\sqrt{3}}{2} & -\frac{1}{2}-j\frac{\sqrt{3}}{2}
+        \end{bmatrix}
+        \begin{bmatrix}
+            2\\
+            3\\
+            -1
+        \end{bmatrix}=
+        \begin{bmatrix}
+            4\\
+            1-2\sqrt{3}j\\
+            1+2\sqrt{3}j
+        \end{bmatrix}
+        $$
+        As we want to remove the high frequencies, we choose
+        $$
+        H[k]=\begin{bmatrix}
+            1\\
+            0\\
+            0
+        \end{bmatrix}
+        \Rightarrow
+        Y[k]=X[k]\cdot H[k]=\begin{bmatrix}
+            4\\
+            0\\
+            0
+        \end{bmatrix}
+        $$
+    }
+
+    \subsubsection{DFT matrix inverse, out put in time domain}
+    [4pts] Transform $H[k]$ and $Y[k]$ into their time domain representation
+
+    \mybox{
+        The inverse opf $W$ is its conjugate transpose divided by $N=3$
+        $$
+        W=
+        \begin{bmatrix}
+            1 & 1 & 1\\
+            1 & -\frac{1}{2}-j\frac{\sqrt{3}}{2} & -\frac{1}{2}+j\frac{\sqrt{3}}{2}\\
+            1 & -\frac{1}{2}+j\frac{\sqrt{3}}{2} & -\frac{1}{2}-j\frac{\sqrt{3}}{2}
+        \end{bmatrix}\rightarrow
+        W^{-1}=
+        \frac{1}{3}
+        \begin{bmatrix}
+            1 & 1 & 1\\
+            1 & -\frac{1}{2}+j\frac{\sqrt{3}}{2} & -\frac{1}{2}-j\frac{\sqrt{3}}{2}\\
+            1 & -\frac{1}{2}-j\frac{\sqrt{3}}{2} & -\frac{1}{2}+j\frac{\sqrt{3}}{2}
+        \end{bmatrix}
+        $$
+        $$
+        y[n]=W^{-1}Y[k]=\frac{1}{3}
+        \begin{bmatrix}
+            1 & 1 & 1\\
+            1 & -\frac{1}{2}+j\frac{\sqrt{3}}{2} & -\frac{1}{2}-j\frac{\sqrt{3}}{2}\\
+            1 & -\frac{1}{2}-j\frac{\sqrt{3}}{2} & -\frac{1}{2}+j\frac{\sqrt{3}}{2}
+        \end{bmatrix}
+        \begin{bmatrix}
+            4\\
+            0\\
+            0
+        \end{bmatrix}=
+        \begin{bmatrix}
+            4/3\\
+            4/3\\
+            4/3
+        \end{bmatrix}
+        $$
+        $$
+        h[n]=W^{-1}H[k]=\frac{1}{3}
+        \begin{bmatrix}
+            1 & 1 & 1\\
+            1 & -\frac{1}{2}+j\frac{\sqrt{3}}{2} & -\frac{1}{2}-j\frac{\sqrt{3}}{2}\\
+            1 & -\frac{1}{2}-j\frac{\sqrt{3}}{2} & -\frac{1}{2}+j\frac{\sqrt{3}}{2}
+        \end{bmatrix}
+        \begin{bmatrix}
+            1\\
+            0\\
+            0
+        \end{bmatrix}=
+        \begin{bmatrix}
+            1/3\\
+            1/3\\
+            1/3
+        \end{bmatrix}
+        $$
     }
 
 \pagebreak\subsection{20190116-2}
@@ -1007,6 +1308,150 @@
         The output is:
         $$
         y[n]=2\cdot 1.1065\cos\left(\frac{\pi}{4}n-0.053\right)+4\cdot 1.09\cos(\pi n)
+        $$
+    }
+
+\pagebreak\subsection{20161121-1}
+    A signal is sampled at $80kHz$. We want to transform the sampled digital signal into a signal sampled at $120kHz$.
+
+    \subsubsection{Upsample by noninteger pipeline}
+    Define the whole pipeline to get this result providing accurate description of the filters adopted both for sampling and re-sampling.
+
+    \mybox{
+        $$
+        80\rightarrow 240\rightarrow 120
+        $$
+        $$
+        L=3\qquad M=2
+        $$
+        In the upsample the spectrum will be compressed of an order of 3, replicas will appear below the Nyquist frequency.
+        
+        We add a lowpass filter with a cutoff of $\min\left[\frac{\pi}{3},\frac{\pi}{2}\right]=\frac{\pi}{3}$ to remove the replicase below the Nyquist frequency. At the same time the LPF will prevent aliasing that the downsampling would have introduced.
+        \begin{center}
+            \includegraphics[width=1\textwidth]{images/20161121_11.png}
+        \end{center}
+    }
+    \pagebreak
+
+    \subsubsection{DFT matrix in upsampling}
+    We want to re-sample the signal in real-time working on blocks of 1024 samples and in frequency domain.
+    \begin{enumerate}
+        \item Describe how the DFT can be obtained, provide how the transform matrix can be realized for this specific case and the operations to get the DFT of the input signal
+        \item Define a proper filter in the frequency domain for the specific task of the first question and how it has to be applied to the signal
+        \item Describe how the filtered signal can be transformed back into the time domain. Are there issues related to circular convolution for periodicity assumption for this specific case?
+    \end{enumerate}
+    \mybox{
+        \begin{enumerate}
+            \item In order to apply the upsampling and then the filter in the frequency domain I need to take 1024 samples from the signal, add two samples with zero value every sample and then define the DFT Matrix.\\
+            \item The DFT kernel is $w=e^{j\frac{2\pi}{2\cdot 1024}}=e^{j\frac{\pi}{1536}}$, so the $W$ matrix for the DFT will be $3072\times 3072$ matrix.
+        
+            Once I multiply this matrix with the set of upsampled samples I get the DFT of the upsampled signal, then we apply the low pass filter in the frequency domain by removing all the frequencies between $\frac{\pi}{3}$ and $2\pi-\frac{\pi}{3}=\frac{5}{3}\pi$ (since now I have to consider that my spectrum is represented in the frequency range between 0 and $2\pi$).
+
+            This can be done simply setting to zero all frequencies between the $513^{th}$ sample (3072/6+1) and the $2560^{th}$ sample (3072*5/6) of the DFT of my signal which is exactly a low-pass filter rectangular in the frequency domain.\\
+            \item In order to go back into the time domain we have to pre-multiply the 3072 samples in the frequency domain to the inverse of our previous matrix.
+
+            Analyzing what we are performing in the time domain, since we are multiplying the spectrum of upsampled signal with a low pass rectangle filter we are implicitly performing a circular convolution with the IDFT of the rectangle filter: $h(n)=\text{sinc}\left(\frac{n}{3}\right)$ sinc 3 whose range of the first lobe is 6 samples.
+            
+            We can then conclude that for a generic signal the circular convolution error is present and, due to the narrowness of the filter its effect operates significantly just of a few samples close to the signal tails. 
+            
+            However, since in this case the signal is input periodic and the number of samples considered is a multiple of the samples in a period no error will be introduced.
+        \end{enumerate}
+    }
+
+\pagebreak\subsection{20161121-2}
+    The following signal:
+    $$
+    x(t)=5+3\cos(2\pi f_1t)+\cos(2\pi f_2t)
+    $$
+    Where $f_1=10kHz$ and $f_2=40kHz$ is sampled at $80kHz$ and is filtered with the following filter:
+    $$
+    H(z)=\frac{
+        1-\sqrt{2}z^{-1}+z^{-2}
+    }{
+        1-0.7\sqrt{2}z^{-1}+0.49z^{-2}
+    }
+    $$
+    \subsubsection{Cosine signal and generic filter (plus a continuous term)}
+    Plot the fitler in the z-plane and provide the output signal in the time domain.
+
+    \mybox{
+        The filter has:
+        \begin{itemize}
+            \item Numerator:
+            $$
+            \begin{cases}
+                2\rho\cos(\theta)=\sqrt{2}\\
+                \rho^2=1
+            \end{cases}
+            \Rightarrow
+            \begin{cases}
+                \theta=\pm\frac{\pi}{4}\\
+                \rho=1
+            \end{cases}
+            $$
+            Two zeros in $e^{\pm j\frac{\pi}{4}}$, two poles in 0
+            \item Denominator:
+            $$
+            \begin{cases}
+                2\rho\cos(\theta)=0.7\sqrt{2}\\
+                \rho^2=0.49
+            \end{cases}
+            \Rightarrow
+            \begin{cases}
+                \theta=\pm\frac{\pi}{4}\\
+                \rho=0.7
+            \end{cases}
+            $$
+            Two poles in $0.7e^{\pm j\frac{\pi}{4}}$, two zeros in 0
+        \end{itemize}
+        So no zeros or poles at the origin:
+        \begin{center}
+            \includegraphics[width=0.8\textwidth]{images/20161121_21.png}
+        \end{center}
+    }
+
+    \mybox{
+        $$
+        H(z)=\frac{
+            1-\sqrt{2}z^{-1}+z^{-2}
+        }{
+            1-0.7\sqrt{2}z^{-1}+0.49z^{-2}
+        }
+        $$
+        The sampled signal will be:
+        $$
+        x[n]=5+3\cos\left(\frac{\pi}{4}n\right)+\cos(\pi n)
+        $$
+        It has three components:
+        \begin{itemize}
+            \item 5 continuous component, $\tilde{\omega}_0=0\rightarrow z_0=1$
+            $$
+            \begin{cases}
+                |H(z_0)|=\frac{|1-\sqrt{2}+1|}{|1-0.7\sqrt{2}+0.49|}\sim 1.17\\
+                \angle H(z_1)=0
+            \end{cases}
+            $$
+            \item $\tilde{\omega}_1=\frac{\pi}{4}\rightarrow z_1=1\cdot e^{j\pi/4}$
+            $$
+            \begin{cases}
+                |H(z_1)|=0\qquad\text{It is a zero}\\
+                \angle H(z_1)=\cdots
+            \end{cases}
+            $$
+            \item $\tilde{\omega}_2=\pi\rightarrow z_2=1\cdot e^{j\pi}=-1$
+            $$
+            \begin{cases}
+                |H(z_2)|=\frac{|1+\sqrt{2}+1|}{|1+0.7\sqrt{2}+0.49|}\sim 1.38\\
+                \angle H(z_2)=0
+            \end{cases}
+            $$
+        \end{itemize}
+        The output will be
+        $$
+        y[n]=5\cdot 1.17+0+1.38\cdot\cos\left(\pi n+0\right)
+        $$
+        $$
+        y[n]=5.85+1.38\cdot(-1)^n
         $$
     }
 
@@ -1302,3 +1747,4 @@
         $$
         Or compute the DFT of the filter $h$ and then multiply element-wise $y$ and $h$
     }
+
