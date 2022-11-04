@@ -572,7 +572,10 @@
         $$
         x[n]=10\cos\left(\frac{\pi}{2}n\right)+5\sin\left(\frac{3\pi}{4}n\right)
         $$
-        We know that the DFT of a sinusoid will introduce two symmetric pulses at $\pm\tilde{f}_0$, so in this case we will have 4 pulses, two of which is half the magnitude of the other:
+        We know that the DFT of a sinusoid will introduce two symmetric pulses at $\pm\tilde{f}_0$, so in this case we will have 4 pulses. On the next equations we omitted the correct magnitude of each pulse, each term should be multiplied by 
+        $$
+        A=\underlabel{\frac{10}{2}}{In presence of cos, magnitude of pulse is $A/2$}=5
+        $$
         $$
         X(f)=
         \delta\left(f-\frac{\pi}{2}\right)
@@ -581,10 +584,6 @@
             \delta\left(f-\left(2\pi-\frac{\pi}{2}\right)\right)+
             \frac{1}{2}\delta\left(f-\left(2\pi-\frac{3\pi}{4}\right)\right)
         }{symmetric pulses}
-        $$
-        The upsampled signal is:
-        $$
-        x_u[n]=10\cos\left(\frac{\pi}{6}n\right)+5\sin\left(\frac{\pi}{4}n\right)
         $$
         The DFT will be $X_u(f)=X(fL)$, or alternatively we know that the peaks are in $\frac{\tilde{\omega}+2\pi k}{L}$
         $$
@@ -631,7 +630,7 @@
     \pagebreak
 
     \mybox{
-        At the end we apply downsampling with $M=2$
+        At the end we apply downsampling with $M=2$, so the position of each pulse will be multiplied by 2
         $$
         X_d(f)=\frac{1}{2}\left[
             \delta\left(f-\frac{\pi}{3}\right)+
@@ -657,6 +656,7 @@
         \begin{center}
             \includegraphics[width=1\textwidth]{images/20211108_24.png}
         \end{center}
+        \textbf{The pulse at $\pi/3$ that introduces aliasing is due to symmetric component that is located AFTER the Nyquist frequency (not seen in the plot): IF ANY PULSE IS FOUND AFTER THE NYQUIST WE WILL HAVE ALIASING}
     }
 
 \pagebreak\subsection{20200218-1}
