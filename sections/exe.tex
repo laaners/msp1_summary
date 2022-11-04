@@ -238,8 +238,8 @@
         We introduce a cutoff of $\omega=\frac{\pi}{M}=\frac{\pi}{3}$ in order to avoid aliasing.
     }
 
-\pagebreak\subsection{20220126-1*}
-    We need to apply the first derivative ($h[n]=\Brackets{1,-1}$) in real-time to a digital signal $x[n]=\Brackets{1,2,0,1,0,1,\cdots}$ working in the frequency domain on blocks of 4 samples.
+\pagebreak\subsection{20220126-1}
+    We need to apply the first derivative ($h[n]=\Brackets{1,-1}$) in real-time to a digital signal $x[n]=\Brackets{1,2,0,-1,0,1,\cdots}$ working in the frequency domain on blocks of 4 samples.
 
     \subsubsection{DFT}
     [4pts] Describe how to get the DFT for each block of the signal and for the filter according to the requested task.
@@ -279,25 +279,176 @@
         $$
     }
 
-    \subsubsection{Overlap and save}
+    \subsubsection{Overlap and save with DFT}
     [7pts] Using the overlap and save algorithm, describe how to find the output for the given signal, provide all the intermediate numerical results and the steps to obtain the final result.
 
     \mybox{
-        Blocks of 4 samples, for overlap and save fot the first block we add $\underlabel{P}{len(h)}-1=1$ leading zeros:
+        Blocks of 4 samples, for overlap and save fot the first block we add $\underlabel{P}{len(h)}-1=1$ leading zeros (the overlap):
         \vspace{1em}
 
         $
         x_1[n]=\Brackets{0,1,2,0}\\
         \\
         x_2[n]=\Brackets{0,-1,0,1}\\
+        \\
+        x_3[n]=\Brackets{1,0,0,0}\qquad\text{overlap last block}\\
+        $
+
+        We have to work in the DFT domain:
+        $$
+        Y_1[k]=X_1[k]\times H[k]=
+        \begin{bmatrix}
+            1 & 1 & 1 & 1\\
+            1 & -j & -1 & j\\
+            1 & -1 & 1 & -1\\
+            1 & j & -1 & -j
+        \end{bmatrix}
+        \begin{bmatrix}
+            0\\
+            1\\
+            2\\
+            0
+        \end{bmatrix}
+        \times
+        \begin{bmatrix}
+            0\\
+            1+j\\
+            2\\
+            1-j
+        \end{bmatrix}
+        =
+        \cdots
+        =
+        \begin{bmatrix}
+            0\\
+            -1-3j\\
+            2\\
+            -1+3j
+        \end{bmatrix}
+        $$
+        $$
+        Y_2[k]=X_2[k]\times H[k]=
+        \begin{bmatrix}
+            1 & 1 & 1 & 1\\
+            1 & -j & -1 & j\\
+            1 & -1 & 1 & -1\\
+            1 & j & -1 & -j
+        \end{bmatrix}
+        \begin{bmatrix}
+            0\\
+            -1\\
+            0\\
+            1
+        \end{bmatrix}
+        \times
+        \begin{bmatrix}
+            0\\
+            1+j\\
+            2\\
+            1-j
+        \end{bmatrix}
+        =
+        \cdots
+        =
+        \begin{bmatrix}
+            0\\
+            -2+2j\\
+            0\\
+            -2-2j
+        \end{bmatrix}
+        $$
+    }
+
+    \mybox{
+        $$\cdots$$
+        Compute the inverse of $W$ (its transpose with complex conjugates), return to time domain, throw the first $P-1=1$ samples, we will get:
+        \vspace{1em}
+
+        $
+        y_1[n]=\Brackets{\cdot,1,1,-2}\\
+        \\
+        y_2[n]=\Brackets{\cdot,-1,1,1}\\
+        \\
+        y_3[n]=\Brackets{\cdot,-1,0,0}        
+        $
+        $$
+        y[n]=\Brackets{1,1,-2,-1,1,1,-1,0,0}
+        $$
+    }
+
+    \subsubsection{Overlap and save in time domain}
+    [2pts] Check that working in the time domain you would get the same result.
+
+    \mybox{
+        Consider the filter $h[n]=\Brackets{1,-1}$
+        As the filter $h[n]$ has length $P=2$, we need to add $P-1=1$ "0"s at the beginning to account for the circular convolution effect
+        $$
+        L=N+P-1=3+2-1=4
+        $$
+
+        $
+        x_1[n]=\Brackets{0,1,2,0}\\
+        \\
+        x_2[n]=\Brackets{0,-1,0,1}\\
+        \\
+        x_3[n]=\Brackets{1,0,0,0}
         $
 
         \vspace{1em}
-        At this point we could circular convolve with the filter then DFT, or we first DFT the blocks then circular convolve. We decide the first approach and we will get (as $h[n]=\delta[n]-\delta[n-1]$)
+        $$
+        x[n]*h[n]=x[n]*\delta[n]+x[n]*-\delta[n-1]
+        $$
+
+        \begin{center}
+            \begin{tabular}{c|c c c c}
+                $n=$        & 0 & 1 &  2 &  3\\ \hline \hline
+                $x_1[n]$    & 0 & 1 &  2 &  0\\
+                $-x_1[n-1]$ & 0 & 0 & -1 & -2\\ \hline
+                $x_2[n]$    & 0 &-1 &  0 &  1\\
+                $-x_2[n-1]$ & 0 & 0 &  1 &  0\\ \hline
+                $x_3[n]$    & 1 & 0 &  0 &  0\\
+                $-x_3[n-1]$ & 0 &-1 &  0 &  0
+            \end{tabular}        
+        \end{center}
+        \vspace{1em}
+        We throw the first two as $P-1=1$, keep the next $L-1=3$, so:
+        \vspace{1em}
 
         $
-        y_1[n]=\Brackets{0,1,1,-2,0}
+        \Rightarrow y_1[n]=\begin{Bmatrix}
+            \cdot & 1 & 1 & -2
+        \end{Bmatrix}\\
+        \Rightarrow y_2[n]=\begin{Bmatrix}
+            \cdot &-1 & 1 & 1
+        \end{Bmatrix}\\
+        \Rightarrow y_3[n]=\begin{Bmatrix}
+            \cdot &-1 & 0 & 0
+        \end{Bmatrix}
         $
+
+        \vspace{1em}
+        And the final result is
+        $$
+        y[n]=\Brackets{y_1\,\,y_2\,\,y_3}=\Brackets{1,1,-2,-1,1,1,-1}
+        $$
+    }
+
+    \subsubsection{Overlap and Add}
+    Overlap and add example
+
+    \mybox{
+        $$x[n]=\Brackets{1,2,0,-1,0,1,\cdots}$$
+        We would have:
+        \vspace{1em}
+
+        $
+        x_1[n]=\Brackets{1,2,0,-1}\\
+        \\
+        x_2[n]=\Brackets{0,1,0,0}
+        $
+
+        \vspace{1em}
+        Then we compute linear convution normally, then consider overlapping tails (shift every block by length of block $L=4$)
     }
 
 \pagebreak\subsection{20211108-1}
@@ -594,9 +745,6 @@
         \end{itemize}
     }
 
-
-
-
 \pagebreak\subsection{20190910-2}
     A signal $x[n]=\Brackets{-1,-1,2,0,0,1,-2,1,0,1,1,-1}$ shall be filtered with this FIR fitler: $h[n]=\Brackets{1,-1,2}$.\\
     We need to process blocks of 4 samples of the original signal for real time processing and we want to get the result depicting all intermediate steps with these methods:
@@ -673,6 +821,7 @@
         \end{Bmatrix}
         $$
     }
+    
     \subsubsection{Overlap and Save}
     [4pt] Overlap and Save
 
@@ -1243,6 +1392,7 @@
     [3pts] Represent an approximate behavior of the magnitude and phase in the range $(0\,\,-\pi)$.
 
     \mybox{
+        \textbf{It is a notch}
         $$
         H(z)=\frac{
             1+\sqrt{2}z^{-1}+z^{-2}
@@ -1261,7 +1411,7 @@
             \includegraphics[width=0.8\textwidth]{images/20181107_12.png}
         \end{center}
 
-        About the phase, we have to look at the zero plot:
+        About the phase, a notch will have jumps, we have to look at the zero plot:
         \begin{itemize}
             \item $\angle H(z=1)=0$ as we have opposite contributes for both poles and zeros
             \item $\angle H(z=e^{-j\frac{3\pi}{4}})$ we don't know the exact value, but at that pole we will have a jump of $\pi$
@@ -1281,6 +1431,10 @@
         $$
         x(t)=2\cos(2\pi 20t)+3\sin(2\pi 60t)+4\cos(2\pi 80t)
         $$
+        The sampled signal is:
+        $$
+        x(t)=2\cos(\frac{\pi}{4}n)+3\sin(\frac{3\pi}{4}n)+4\cos(\pi n)
+        $$
         It has three components, so:
         \begin{itemize}
             \item $\tilde{f_1}=\frac{f_1}{F_s}=\frac{20}{160}=\frac{1}{8}\rightarrow\tilde{\omega}_1=\frac{\pi}{4}\rightarrow z_1=1*e^{j\pi/4}$
@@ -1297,6 +1451,7 @@
                 \angle H(z_2)=\text{ does not matter, the magnitude is 0 so the term disappears}
             \end{cases}
             $$
+            As a matter of fact the filter is a notch in $\tilde{\omega}_2$ 
             \item $\tilde{f_3}=\frac{f_3}{F_s}=\frac{80}{160}=\frac{1}{2}\rightarrow\tilde{\omega}_3=\pi\rightarrow z_3=1*e^{j\pi}=-1$
             $$
             \begin{cases}
@@ -1343,18 +1498,18 @@
     \mybox{
         \begin{enumerate}
             \item In order to apply the upsampling and then the filter in the frequency domain I need to take 1024 samples from the signal, add two samples with zero value every sample and then define the DFT Matrix.\\
-            \item The DFT kernel is $w=e^{j\frac{2\pi}{2\cdot 1024}}=e^{j\frac{\pi}{1536}}$, so the $W$ matrix for the DFT will be $3072\times 3072$ matrix.
+            \item The DFT kernel is $w=e^{j\frac{2\pi}{3\cdot 1024}}=e^{j\frac{\pi}{1536}}$, so the $W$ matrix for the DFT will be $3072\times 3072$ matrix.
         
             Once I multiply this matrix with the set of upsampled samples I get the DFT of the upsampled signal, then we apply the low pass filter in the frequency domain by removing all the frequencies between $\frac{\pi}{3}$ and $2\pi-\frac{\pi}{3}=\frac{5}{3}\pi$ (since now I have to consider that my spectrum is represented in the frequency range between 0 and $2\pi$).
 
             This can be done simply setting to zero all frequencies between the $513^{th}$ sample (3072/6+1) and the $2560^{th}$ sample (3072*5/6) of the DFT of my signal which is exactly a low-pass filter rectangular in the frequency domain.\\
             \item In order to go back into the time domain we have to pre-multiply the 3072 samples in the frequency domain to the inverse of our previous matrix.
 
-            Analyzing what we are performing in the time domain, since we are multiplying the spectrum of upsampled signal with a low pass rectangle filter we are implicitly performing a circular convolution with the IDFT of the rectangle filter: $h(n)=\text{sinc}\left(\frac{n}{3}\right)$ sinc 3 whose range of the first lobe is 6 samples.
+            Analyzing what we are performing in the time domain, since we are multiplying the spectrum of upsampled signal with a low pass rectangle filter $rect\left(\frac{f}{2\cdot 1/6}\right)$ we are implicitly performing a circular convolution with the IDFT of the rectangle filter: $h(n)=\text{sinc}\left(\frac{n}{3}\right)$ sinc 3 whose range of the first lobe is 6 samples.
             
-            We can then conclude that for a generic signal the circular convolution error is present and, due to the narrowness of the filter its effect operates significantly just of a few samples close to the signal tails. 
-            
-            However, since in this case the signal is input periodic and the number of samples considered is a multiple of the samples in a period no error will be introduced.
+            We can then conclude that for a generic signal the circular convolution error is present and, due to the narrowness of the filter its effect operates significantly just of a few samples close to the signal tails.
+
+            \textbf{Whenever we are multiplying by matrix in DFT, we are introducing some artifacts in the cyclic convolution in the time domain}
         \end{enumerate}
     }
 
