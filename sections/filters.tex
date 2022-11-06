@@ -244,10 +244,12 @@ We want a big ration of $\frac{width(MainLobe)}{width(SecondaryLobes)}$. Every w
     \item \textbf{FIR are always stable}, the numerator has greater grade than denominator
     \item \textbf{Only poles at the origin means FIR}
     \item \textbf{Denominator = 1 means FIR}
-    \item \textbf{Maximum phase} will result in \textbf{jumps in the phase plot}
+    \item \textbf{Maximum phase} will result in \textbf{jumps in the phase plot, specifically jumps of $2\pi$}
     \item \textbf{Minimum phase has the greatest part of energy of the filter concentrated in the first part of the temporal samples}, which means I am introducing very small delay
     \item \textbf{Allpass MUST be FIR}
     \item \textbf{A causal stable allpass system has always maximum phase
     zeros}, they are the reciprocal complex conjugate of the poles therefore the \textbf{phase has jumps = $2\pi$}
     \item \textbf{DFT of sinusoid will have peak in the freq/normalized freq depending on representation of frequency domain (either $f_0\,\,[Hz]$ or $\tilde{f_0}$) and another one symmetric w.r.t. Nyquist frequency, and in presence of consine with magnitude $A$, in DFT domain we will have a pulse of magnitude $A/2$}
+    \item \textbf{To attenuate a sinusoid signal of $\tilde{\omega}$, and to have real coefficients in $H$, put zeros in $Ae^{j\tilde{\omega}}$, and in $Ae^{-j\tilde{\omega}}$, $b=poly([zeros])$, to enhance put poles instead with the same criteria. OTHER SIGNALS WILL BE INFLUENCED AS WELL.}
+    \item \textbf{To delete (attenuate) a signal with a frequency $\tilde{\omega}$ WITHOUT INFLUENCING OTHERS SIGNALS we construct a notch: put 2 conjugate zeros in $1\cdot e^{j\tilde{\omega}}$ and 2 conjugate poles in $\rho\cdot e^{j\tilde{\omega}}$, with $\rho<1$} 
 \end{itemize}
